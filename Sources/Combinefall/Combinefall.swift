@@ -19,10 +19,10 @@ fileprivate enum EndpointComponents {
 ///
 /// - Parameter upstream: A publisher which `Output` must be `String`.
 /// - Parameter scheduler: The `RunLoop` on where to preform the operations. Default is the current `RunLoop`.
-public func autocompleteCatalogPublisher<U: Publisher>(upstream: U, scheduler: RunLoop = RunLoop.current) -> AnyPublisher<AutocompleteCatalog, Never> where U.Output == String, U.Failure == Never {
+public func autocompleteCatalogPublisher<U: Publisher, S: Scheduler>(upstream: U, scheduler: S) -> AnyPublisher<AutocompleteCatalog, Never> where U.Output == String, U.Failure == Never {
     upstream
         .filter { $0.count >= 2 }
-        .debounce(for: 0.1, scheduler: scheduler)
+        .debounce(for: .milliseconds(100), scheduler: scheduler)
         .removeDuplicates()
         .compactMap { searchTerm in
             var autoCompleteComponents = EndpointComponents.autocomplete.urlComponents
