@@ -38,18 +38,18 @@ public func autocompleteCatalogPublisher<U: Publisher, S: Scheduler>(upstream: U
         .eraseToAnyPublisher()
 }
 
-public func autocompletePublisher<U: Publisher>(upstream: U, scheduler: RunLoop = RunLoop.current) -> AnyPublisher<[String], Never> where U.Output == String, U.Failure == Never {
+public func autocompletePublisher<U: Publisher, S: Scheduler>(upstream: U, scheduler: S) -> AnyPublisher<[String], Never> where U.Output == String, U.Failure == Never {
     autocompleteCatalogPublisher(upstream: upstream, scheduler: scheduler)
         .map { $0.data }
         .eraseToAnyPublisher()
 }
 
 public extension Publisher where Self.Output == String, Self.Failure == Never {
-    func autocompleteList<T: RunLoop>(on scheduler: T) -> AnyPublisher<AutocompleteCatalog, Never> {
+    func autocompleteList<S: Scheduler>(on scheduler: S) -> AnyPublisher<AutocompleteCatalog, Never> {
         autocompleteCatalogPublisher(upstream: self, scheduler: scheduler)
     }
     
-    func autocomplete<T: RunLoop>(on scheduler: T) -> AnyPublisher<[String], Never> {
+    func autocomplete<S: Scheduler>(on scheduler: S) -> AnyPublisher<[String], Never> {
         autocompletePublisher(upstream: self, scheduler: scheduler)
     }
 }
