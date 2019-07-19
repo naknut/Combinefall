@@ -9,7 +9,7 @@ fileprivate enum EndpointComponents {
     var urlComponents: URLComponents {
         var baseURLCopy = baseURLComponent
         switch self {
-        case .autocomplete: baseURLCopy.path = "/autocomplete"
+        case .autocomplete: baseURLCopy.path = "/cards/autocomplete"
         }
         return baseURLCopy
     }
