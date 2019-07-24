@@ -50,7 +50,7 @@ public func autocompleteCatalogPublisher<U: Publisher, S: Scheduler>(upstream: U
 }
 
 /// Used internaly to inject remote publisher for testing.
-public func _autocompletePublisher<U: Publisher, R: Publisher, S: Scheduler>(upstream: U, remotePublisherFactory: @escaping (URL) -> R, scheduler: S) -> AnyPublisher<[String], Never> where U.Output == String, U.Failure == Never, R.Output == URLSession.DataTaskPublisher.Output, R.Failure == Never {
+func _autocompletePublisher<U: Publisher, R: Publisher, S: Scheduler>(upstream: U, remotePublisherFactory: @escaping (URL) -> R, scheduler: S) -> AnyPublisher<[String], Never> where U.Output == String, U.Failure == Never, R.Output == URLSession.DataTaskPublisher.Output, R.Failure == Never {
     _autocompleteCatalogPublisher(upstream: upstream, remotePublisherFactory: remotePublisherFactory, scheduler: scheduler)
         .map { $0.data }
         .eraseToAnyPublisher()
