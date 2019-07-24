@@ -44,7 +44,7 @@ where U.Output == String, U.Failure == Never, R.Output == URLSession.DataTaskPub
 /// The names are sorted with the nearest match first, highly favoring results that begin with your given string.
 ///
 /// Spaces, punctuation, and capitalization are ignored.
-/// If the `upstream` published `string` is less than 2 characters long,
+/// If the `upstream` published `String` is less than 2 characters long,
 /// or if no names match, this publisher wont publish any values.
 ///
 /// - Parameter upstream: _Required_ A publisher which `Output` must be `String`.
@@ -84,7 +84,7 @@ where U.Output == String, U.Failure == Never, R.Output == URLSession.DataTaskPub
 /// The names are sorted with the nearest match first, highly favoring results that begin with your given string.
 ///
 /// Spaces, punctuation, and capitalization are ignored.
-/// If the `upstream` published `string` is less than 2 characters long,
+/// If the `upstream` published `String` is less than 2 characters long,
 /// or if no names match, this publisher wont publish any values.
 ///
 /// - Parameter upstream: _Required_ A publisher which `Output` must be `String`.
@@ -110,7 +110,7 @@ public extension Publisher where Self.Output == String, Self.Failure == Never {
     /// The names are sorted with the nearest match first, highly favoring results that begin with your given string.
     ///
     /// Spaces, punctuation, and capitalization are ignored.
-    /// If the `upstream` published `string` is less than 2 characters long,
+    /// If the `upstream` published `String` is less than 2 characters long,
     /// or if no names match, this publisher wont publish any values.
     ///
     /// - Parameter scheduler: _Required_ The scheduler on which this publisher delivers elements
@@ -126,7 +126,7 @@ public extension Publisher where Self.Output == String, Self.Failure == Never {
     /// The names are sorted with the nearest match first, highly favoring results that begin with your given string.
     ///
     /// Spaces, punctuation, and capitalization are ignored.
-    /// If the `upstream` published `string` is less than 2 characters long,
+    /// If the `upstream` published `String` is less than 2 characters long,
     /// or if no names match, this publisher wont publish any values.
     ///
     /// - Parameter scheduler: _Required_ The scheduler on which this publisher delivers elements
