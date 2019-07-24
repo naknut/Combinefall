@@ -16,7 +16,7 @@ private enum EndpointComponents {
 }
 
 // Used internaly to inject remote publisher for testing.
-// swiftlint:disable:next identifier_names
+// swiftlint:disable:next identifier_name
 func _autocompleteCatalogPublisher<U: Publisher, R: Publisher, S: Scheduler> (
     upstream: U, remotePublisherFactory: @escaping (URL) -> R, scheduler: S
 ) -> AnyPublisher<AutocompleteCatalog, Never>
