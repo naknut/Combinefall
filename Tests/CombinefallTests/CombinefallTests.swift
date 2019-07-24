@@ -5,8 +5,8 @@ import Combine
 struct URLSessionMockPublisher: Publisher {
     typealias Output = URLSession.DataTaskPublisher.Output
     typealias Failure = Never
-    
-    func receive<S>(subscriber: S) where S : Subscriber, Failure == S.Failure, Output == S.Input {
+
+    func receive<S>(subscriber: S) where S: Subscriber, Failure == S.Failure, Output == S.Input {
         subscriber.receive(subscription: URLSessionMockPublisherSubscription(subscriber: subscriber))
     }
 }
@@ -19,15 +19,15 @@ class URLSessionMockPublisherSubscription<S: Subscriber>: Subscription where S.I
             "data": ["Jace"]
         }
         """.data(using: .utf8)!
-    
+
     init(subscriber: S) {
         self.subscriber = subscriber
     }
-    
+
     func request(_ demand: Subscribers.Demand) {
         _ = subscriber?.receive((testData, URLResponse()))
     }
-    
+
     func cancel() {
         subscriber = nil
     }
@@ -47,12 +47,16 @@ final class CombinefallTests: XCTestCase {
         }
         XCTAssert(catalog.totalValues == 0)
     }
-    
+
     @Published var testUpstream: String = ""
-    
+
     func testAutocompleteCatalog() {
         let expectation = XCTestExpectation(description: "Let publisher publish")
-        _ = _autocompleteCatalogPublisher(upstream: $testUpstream, remotePublisherFactory: { (_: URL) in URLSessionMockPublisher() }, scheduler: RunLoop.current)
+        _ = _autocompleteCatalogPublisher(
+                upstream: $testUpstream,
+                remotePublisherFactory: { (_: URL) in URLSessionMockPublisher() },
+                scheduler: RunLoop.current
+            )
             .sink { catalog in
                 XCTAssert(catalog.totalValues == 1)
                 XCTAssert(catalog.data.count == 1)
@@ -62,10 +66,14 @@ final class CombinefallTests: XCTestCase {
         testUpstream = "Foo"
         wait(for: [expectation], timeout: 10.0)
     }
-    
+
     func testAutocomplete() {
             let expectation = XCTestExpectation(description: "Let publisher publish")
-            _ = _autocompletePublisher(upstream: $testUpstream, remotePublisherFactory: { (_: URL) in URLSessionMockPublisher() }, scheduler: RunLoop.current)
+            _ = _autocompletePublisher(
+                    upstream: $testUpstream,
+                    remotePublisherFactory: { (_: URL) in URLSessionMockPublisher() },
+                    scheduler: RunLoop.current
+                )
                 .sink { list in
                     XCTAssert(list.count == 1)
                     XCTAssert(list.first == "Jace")
@@ -78,6 +86,6 @@ final class CombinefallTests: XCTestCase {
     static var allTests = [
         ("testCatalog", testCatalog),
         ("testAutocompleteCatalog", testAutocompleteCatalog),
-        ("testAutocomplete", testAutocomplete),
+        ("testAutocomplete", testAutocomplete)
     ]
 }
