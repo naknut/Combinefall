@@ -15,7 +15,7 @@ fileprivate enum EndpointComponents {
     }
 }
 
-// Used internaly to inject remote publisher for testing.
+/// Used internaly to inject remote publisher for testing.
 func _autocompleteCatalogPublisher<U: Publisher, R: Publisher, S: Scheduler>(upstream: U, remotePublisherFactory: @escaping (URL) -> R, scheduler: S) -> AnyPublisher<AutocompleteCatalog, Never> where U.Output == String, U.Failure == Never, R.Output == URLSession.DataTaskPublisher.Output, R.Failure == Never {
     upstream
         .filter { $0.count >= 2 }
@@ -49,6 +49,12 @@ public func autocompleteCatalogPublisher<U: Publisher, S: Scheduler>(upstream: U
     _autocompleteCatalogPublisher(upstream: upstream, remotePublisherFactory: { URLSession.shared.dataTaskPublisher(for: $0).assertNoFailure() }, scheduler: scheduler)
 }
 
+/// Used internaly to inject remote publisher for testing.
+public func _autocompletePublisher<U: Publisher, R: Publisher, S: Scheduler>(upstream: U, remotePublisherFactory: @escaping (URL) -> R, scheduler: S) -> AnyPublisher<[String], Never> where U.Output == String, U.Failure == Never, R.Output == URLSession.DataTaskPublisher.Output, R.Failure == Never {
+    _autocompleteCatalogPublisher(upstream: upstream, remotePublisherFactory: remotePublisherFactory, scheduler: scheduler)
+        .map { $0.data }
+        .eraseToAnyPublisher()
+}
 
 /// Creates a publisher connected to upstream that queries the autocomplete endpoint of Scryfall.
 ///
@@ -63,9 +69,7 @@ public func autocompleteCatalogPublisher<U: Publisher, S: Scheduler>(upstream: U
 /// - Parameter scheduler: _Required_ The `Scheduler` on where to preform the operations.
 /// - Returns: A publisher that publishes a `[String]` containing up to 20 full English card names that could be autocompletions of the given `upstream` published element.
 public func autocompletePublisher<U: Publisher, S: Scheduler>(upstream: U, scheduler: S) -> AnyPublisher<[String], Never> where U.Output == String, U.Failure == Never {
-    autocompleteCatalogPublisher(upstream: upstream, scheduler: scheduler)
-        .map { $0.data }
-        .eraseToAnyPublisher()
+    _autocompletePublisher(upstream: upstream, remotePublisherFactory: { URLSession.shared.dataTaskPublisher(for: $0).assertNoFailure() }, scheduler: scheduler)
 }
 
 public extension Publisher where Self.Output == String, Self.Failure == Never {

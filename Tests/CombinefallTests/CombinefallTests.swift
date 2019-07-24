@@ -13,7 +13,12 @@ struct URLSessionMockPublisher: Publisher {
 
 class URLSessionMockPublisherSubscription<S: Subscriber>: Subscription where S.Input == URLSessionMockPublisher.Output {
     var subscriber: S?
-    let testData = try! JSONEncoder().encode(AutocompleteCatalog(totalValues: 1, data: ["Jace"]))
+    let testData = """
+        {
+            "total_values": 1,
+            "data": ["Jace"]
+        }
+        """.data(using: .utf8)!
     
     init(subscriber: S) {
         self.subscriber = subscriber
@@ -45,7 +50,7 @@ final class CombinefallTests: XCTestCase {
     
     @Published var testUpstream: String = ""
     
-    func testAutocomplete() {
+    func testAutocompleteCatalog() {
         let expectation = XCTestExpectation(description: "Let publisher publish")
         _ = _autocompleteCatalogPublisher(upstream: $testUpstream, remotePublisherFactory: { (_: URL) in URLSessionMockPublisher() }, scheduler: RunLoop.current)
             .sink { catalog in
@@ -57,9 +62,22 @@ final class CombinefallTests: XCTestCase {
         testUpstream = "Foo"
         wait(for: [expectation], timeout: 10.0)
     }
+    
+    func testAutocomplete() {
+            let expectation = XCTestExpectation(description: "Let publisher publish")
+            _ = _autocompletePublisher(upstream: $testUpstream, remotePublisherFactory: { (_: URL) in URLSessionMockPublisher() }, scheduler: RunLoop.current)
+                .sink { list in
+                    XCTAssert(list.count == 1)
+                    XCTAssert(list.first == "Jace")
+                    expectation.fulfill()
+                }
+            testUpstream = "Foo"
+            wait(for: [expectation], timeout: 10.0)
+        }
 
     static var allTests = [
         ("testCatalog", testCatalog),
+        ("testAutocompleteCatalog", testAutocompleteCatalog),
         ("testAutocomplete", testAutocomplete),
     ]
 }
