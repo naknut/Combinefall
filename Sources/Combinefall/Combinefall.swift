@@ -42,7 +42,6 @@ where
         .map { $0.data }
         .decode(type: AutocompleteCatalog.self, decoder: JSONDecoder())
         .mapError { error -> Combinefall.Error in
-            print("ERROR 2")
             if let urlError = error as? URLError {
                 if 400...500 ~= urlError.errorCode { return .scryfall(underlying: urlError) }
                 return .network(underlying: urlError)

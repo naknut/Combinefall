@@ -2,110 +2,97 @@ import XCTest
 import Combine
 @testable import Combinefall
 
+private struct URLSessionMockPublisher: Publisher {
+    typealias Output = URLSession.DataTaskPublisher.Output
+    typealias Failure = URLSession.DataTaskPublisher.Failure
+
+    func receive<S>(subscriber: S) where S: Subscriber, Failure == S.Failure, Output == S.Input {
+        subscriber.receive(subscription: URLSessionMockPublisherSubscription(subscriber: subscriber))
+    }
+}
+
+private class URLSessionMockPublisherSubscription<S: Subscriber>: Subscription
+where S.Input == URLSessionMockPublisher.Output {
+    var subscriber: S?
+    let testData = """
+        {
+            "total_values": 1,
+            "data": ["Jace"]
+        }
+        """.data(using: .utf8)!
+
+    init(subscriber: S) {
+        self.subscriber = subscriber
+    }
+
+    func request(_ demand: Subscribers.Demand) {
+        _ = subscriber?.receive((testData, URLResponse()))
+        subscriber?.receive(completion: .finished)
+    }
+
+    func cancel() {
+        subscriber = nil
+    }
+}
+
+private struct FailingURLSessionMockPublisher: Publisher {
+    typealias Output = URLSession.DataTaskPublisher.Output
+    typealias Failure = URLSession.DataTaskPublisher.Failure
+
+    func receive<S>(subscriber: S) where S: Subscriber, Failure == S.Failure, Output == S.Input {
+        subscriber.receive(subscription: FailSubscription(subscriber: subscriber))
+    }
+}
+
+private class FailSubscription<S: Subscriber>: Subscription
+where S.Input == FailingURLSessionMockPublisher.Output, S.Failure == FailingURLSessionMockPublisher.Failure {
+    var subscriber: S?
+    init(subscriber: S) {
+        self.subscriber = subscriber
+    }
+
+    func request(_ demand: Subscribers.Demand) {
+        subscriber?.receive(completion: Subscribers.Completion<URLError>.failure(URLError(.cannotDecodeRawData)))
+    }
+
+    func cancel() {
+        subscriber = nil
+    }
+}
+
+private struct BadDataMockPublisher: Publisher {
+    typealias Output = URLSession.DataTaskPublisher.Output
+    typealias Failure = URLSession.DataTaskPublisher.Failure
+
+    func receive<S>(subscriber: S) where S: Subscriber, Failure == S.Failure, Output == S.Input {
+        subscriber.receive(subscription: BadDataSubscription(subscriber: subscriber))
+    }
+}
+
+private class BadDataSubscription<S: Subscriber>: Subscription
+where S.Input == FailingURLSessionMockPublisher.Output, S.Failure == FailingURLSessionMockPublisher.Failure {
+    var subscriber: S?
+    let testData = """
+        {
+            "total_values": 1,
+            "data": ["Jace"]
+        """.data(using: .utf8)!
+
+    init(subscriber: S) {
+        self.subscriber = subscriber
+    }
+
+    func request(_ demand: Subscribers.Demand) {
+        _ = subscriber?.receive((testData, URLResponse()))
+        subscriber?.receive(completion: .finished)
+    }
+
+    func cancel() {
+        subscriber = nil
+    }
+}
+
 final class CombinefallTests: XCTestCase {
-    struct URLSessionMockPublisher: Publisher {
-        typealias Output = URLSession.DataTaskPublisher.Output
-        typealias Failure = URLSession.DataTaskPublisher.Failure
-
-        func receive<S>(subscriber: S) where S: Subscriber, Failure == S.Failure, Output == S.Input {
-            subscriber.receive(subscription: URLSessionMockPublisherSubscription(subscriber: subscriber))
-        }
-    }
-
-    class URLSessionMockPublisherSubscription<S: Subscriber>: Subscription where S.Input == URLSessionMockPublisher.Output {
-        var subscriber: S?
-        let testData = """
-            {
-                "total_values": 1,
-                "data": ["Jace"]
-            }
-            """.data(using: .utf8)!
-
-        init(subscriber: S) {
-            self.subscriber = subscriber
-        }
-
-        func request(_ demand: Subscribers.Demand) {
-            _ = subscriber?.receive((testData, URLResponse()))
-            subscriber?.receive(completion: .finished)
-        }
-
-        func cancel() {
-            subscriber = nil
-        }
-    }
-
-    struct FailingURLSessionMockPublisher: Publisher {
-        typealias Output = URLSession.DataTaskPublisher.Output
-        typealias Failure = URLSession.DataTaskPublisher.Failure
-
-        func receive<S>(subscriber: S) where S: Subscriber, Failure == S.Failure, Output == S.Input {
-            subscriber.receive(subscription: FailSubscription(subscriber: subscriber))
-        }
-    }
-
-    class FailSubscription<S: Subscriber>: Subscription
-    where S.Input == FailingURLSessionMockPublisher.Output, S.Failure == FailingURLSessionMockPublisher.Failure {
-        var subscriber: S?
-        init(subscriber: S) {
-            self.subscriber = subscriber
-        }
-
-        func request(_ demand: Subscribers.Demand) {
-            subscriber?.receive(completion: Subscribers.Completion<URLError>.failure(URLError(.cannotDecodeRawData)))
-        }
-
-        func cancel() {
-            subscriber = nil
-        }
-    }
-
-    struct BadDataMockPublisher: Publisher {
-        typealias Output = URLSession.DataTaskPublisher.Output
-        typealias Failure = URLSession.DataTaskPublisher.Failure
-
-        func receive<S>(subscriber: S) where S: Subscriber, Failure == S.Failure, Output == S.Input {
-            subscriber.receive(subscription: BadDataSubscription(subscriber: subscriber))
-        }
-    }
-
-    class BadDataSubscription<S: Subscriber>: Subscription
-    where S.Input == FailingURLSessionMockPublisher.Output, S.Failure == FailingURLSessionMockPublisher.Failure {
-        var subscriber: S?
-        let testData = """
-            {
-                "total_values": 1,
-                "data": ["Jace"]
-            """.data(using: .utf8)!
-
-        init(subscriber: S) {
-            self.subscriber = subscriber
-        }
-
-        func request(_ demand: Subscribers.Demand) {
-            _ = subscriber?.receive((testData, URLResponse()))
-            subscriber?.receive(completion: .finished)
-        }
-
-        func cancel() {
-            subscriber = nil
-        }
-    }
-    
-    func testCatalog() {
-        let testJSON = """
-            {
-                "total_values": 0,
-                "data": []
-            }
-            """
-        guard let catalog = try? JSONDecoder().decode(Catalog<String>.self, from: testJSON.data(using: .utf8)!) else {
-            XCTFail("Could not decode JSON")
-            return
-        }
-        XCTAssert(catalog.totalValues == 0)
-    }
-
     @Published var testUpstream: String = ""
     var cancellable: AnyCancellable?
 
@@ -190,7 +177,6 @@ final class CombinefallTests: XCTestCase {
     }
 
     static var allTests = [
-        ("testCatalog", testCatalog),
         ("testAutocompleteCatalog", testAutocompleteCatalog),
         ("testAutocomplete", testAutocomplete),
         ("testNetworkError", testNetworkError),
