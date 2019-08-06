@@ -15,25 +15,40 @@ private enum EndpointComponents {
     }
 }
 
+public enum Error: Swift.Error {
+    case network(underlying: URLError), decode(underlying: Swift.Error), scryfall(underlying: URLError)
+}
+
 // Used internaly to inject remote publisher for testing.
 // swiftlint:disable:next identifier_name
 func _autocompleteCatalogPublisher<U: Publisher, R: Publisher, S: Scheduler> (
-    upstream: U, remotePublisherFactory: @escaping (URL) -> R, scheduler: S
-) -> AnyPublisher<AutocompleteCatalog, Never>
-where U.Output == String, U.Failure == Never, R.Output == URLSession.DataTaskPublisher.Output, R.Failure == Never {
+    upstream: U,
+    remotePublisherClosure: @escaping (URL) -> R, scheduler: S
+) -> AnyPublisher<AutocompleteCatalog, Combinefall.Error>
+where
+    U.Output == String,
+    U.Failure == Never,
+    R.Output == URLSession.DataTaskPublisher.Output,
+    R.Failure == URLSession.DataTaskPublisher.Failure {
     upstream
-        .filter { $0.count >= 2 }
         .debounce(for: .milliseconds(100), scheduler: scheduler)
         .removeDuplicates()
-        .compactMap { searchTerm in
+        .setFailureType(to: URLSession.DataTaskPublisher.Failure.self)
+        .flatMap { searchTerm -> R in
             var autoCompleteComponents = EndpointComponents.autocomplete.urlComponents
             autoCompleteComponents.queryItems = [URLQueryItem(name: "q", value: searchTerm)]
-            return autoCompleteComponents.url
+            return remotePublisherClosure(autoCompleteComponents.url!)
         }
-        .flatMap { (url: URL) in remotePublisherFactory(url) }
         .map { $0.data }
         .decode(type: AutocompleteCatalog.self, decoder: JSONDecoder())
-        .replaceError(with: AutocompleteCatalog(totalValues: 0, data: []))
+        .mapError { error -> Combinefall.Error in
+            print("ERROR 2")
+            if let urlError = error as? URLError {
+                if 400...500 ~= urlError.errorCode { return .scryfall(underlying: urlError) }
+                return .network(underlying: urlError)
+            }
+            return .decode(underlying: error)
+        }
         .eraseToAnyPublisher()
 }
 
@@ -53,11 +68,11 @@ where U.Output == String, U.Failure == Never, R.Output == URLSession.DataTaskPub
 ///            20 full English card names that could be autocompletions of the given `upstream` published element.
 public func autocompleteCatalogPublisher<U: Publisher, S: Scheduler>(
     upstream: U, scheduler: S
-) -> AnyPublisher<AutocompleteCatalog, Never>
+) -> AnyPublisher<AutocompleteCatalog, Error>
 where U.Output == String, U.Failure == Never {
     _autocompleteCatalogPublisher(
         upstream: upstream,
-        remotePublisherFactory: { URLSession.shared.dataTaskPublisher(for: $0).assertNoFailure() },
+        remotePublisherClosure: URLSession.shared.dataTaskPublisher,
         scheduler: scheduler
     )
 }
@@ -65,12 +80,16 @@ where U.Output == String, U.Failure == Never {
 // Used internaly to inject remote publisher for testing.
 // swiftlint:disable:next identifier_name
 func _autocompletePublisher<U: Publisher, R: Publisher, S: Scheduler>(
-    upstream: U, remotePublisherFactory: @escaping (URL) -> R, scheduler: S
-) -> AnyPublisher<[String], Never>
-where U.Output == String, U.Failure == Never, R.Output == URLSession.DataTaskPublisher.Output, R.Failure == Never {
+    upstream: U, remotePublisherClosure: @escaping (URL) -> R, scheduler: S
+) -> AnyPublisher<[String], Error>
+where
+    U.Output == String,
+    U.Failure == Never,
+    R.Output == URLSession.DataTaskPublisher.Output,
+    R.Failure == URLSession.DataTaskPublisher.Failure {
     _autocompleteCatalogPublisher(
         upstream: upstream,
-        remotePublisherFactory: remotePublisherFactory,
+        remotePublisherClosure: remotePublisherClosure,
         scheduler: scheduler
     )
         .map { $0.data }
@@ -93,11 +112,11 @@ where U.Output == String, U.Failure == Never, R.Output == URLSession.DataTaskPub
 ///            20 full English card names that could be autocompletions of the given `upstream` published element.
 public func autocompletePublisher<U: Publisher, S: Scheduler>(
     upstream: U, scheduler: S
-) -> AnyPublisher<[String], Never>
+) -> AnyPublisher<[String], Error>
 where U.Output == String, U.Failure == Never {
     _autocompletePublisher(
         upstream: upstream,
-        remotePublisherFactory: { URLSession.shared.dataTaskPublisher(for: $0).assertNoFailure() },
+        remotePublisherClosure: URLSession.shared.dataTaskPublisher,
         scheduler: scheduler
     )
 }
@@ -116,7 +135,7 @@ public extension Publisher where Self.Output == String, Self.Failure == Never {
     /// - Parameter scheduler: _Required_ The scheduler on which this publisher delivers elements
     /// - Returns: A publisher that publishes a `AutocompleteCatalog` containing up to
     ///            20 full English card names that could be autocompletions of the given `upstream` published element.
-    func autocompleteList<S: Scheduler>(on scheduler: S) -> AnyPublisher<AutocompleteCatalog, Never> {
+    func autocompleteList<S: Scheduler>(on scheduler: S) -> AnyPublisher<AutocompleteCatalog, Error> {
         autocompleteCatalogPublisher(upstream: self, scheduler: scheduler)
     }
 
@@ -132,7 +151,7 @@ public extension Publisher where Self.Output == String, Self.Failure == Never {
     /// - Parameter scheduler: _Required_ The scheduler on which this publisher delivers elements
     /// - Returns: A publisher that publishes a `[String]` containing up to
     ///            20 full English card names that could be autocompletions of the given `upstream` published element.
-    func autocomplete<S: Scheduler>(on scheduler: S) -> AnyPublisher<[String], Never> {
+    func autocomplete<S: Scheduler>(on scheduler: S) -> AnyPublisher<[String], Error> {
         autocompletePublisher(upstream: self, scheduler: scheduler)
     }
 }
