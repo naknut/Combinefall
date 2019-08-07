@@ -5,7 +5,7 @@ import Foundation
 public struct Card: Decodable {
 
     // MARK: - Core Card Properties
-    
+
     /// A language that a `Card` can be printed in.
     ///
     ///Scryfall archives Magic cards in 17 languages (including some unofficial languages).
@@ -33,51 +33,51 @@ public struct Card: Decodable {
 
     ///The Arena ID, if any. A large percentage of cards are not available on Arena and if not this will be `nil`.
     public let arenaIdentifier: Int?
-    
+
     ///A unique ID for this `Card` in Scryfall’s database.
     public let identifier: UUID
-    
+
     ///The `Language` for this printing.
     public let language: Language
-    
+
     ///The Magic Online ID (also known as the Catalog ID), if any.
     ///
     ///A large percentage of cards are not available on Magic Online and if not this will be `nil`.
     public let magicOnlineIdentifier: Int?
-    
+
     ///The foil Magic Online ID (also known as the Catalog ID), if any.
     ///
     ///A large percentage of cards are not available on Magic Online and if not this will be `nil`.
     public let magicOnlineFoilIdentifier: Int?
-    
+
     ///The multiverse IDs on Gatherer, if any, as an array of integers.
     ///
     ///Scryfall includes many promo cards, tokens, and other esoteric objects that do not have these identifiers.
     public let multiverseIdentifier: [Int]?
-    
+
     ///The ID on TCGplayer’s API, also known as the productId.
     public let tcgPlayerIdentifier: Int
-    
+
     ///A unique ID for oracle identity.
     ///
     ///This value is consistent across reprinted card editions,
     ///and unique among different cards with the same name (tokens, Unstable variants, etc).
     public let oracleIdentifier: UUID
-    
+
     ///A link to where you can begin paginating all re/prints for this card on Scryfall’s API.
     public let printsSearchUrl: URL
-    
+
     ///A link to the rulings list for this `Card` on Scryfall’s API.
     public let rulingsUrl: URL
-    
+
     ///A link to the permapage for this `Card` on Scryfall’s website.
     public let scryfallUrl: URL
-    
+
     ///A link to this `Card` on Scryfall’s API.
     public let url: URL
-    
+
     // MARK: - Gameplay Properties
-    
+
     public struct RelatedCard: Decodable {
         public enum Component: String, Decodable {
             case token
@@ -85,13 +85,13 @@ public struct Card: Decodable {
             case meldResult = "meld_result"
             case comboPiece = "combo_piece"
         }
-        
+
         public let identifier: UUID
         public let component: Component
         public let name: String
         public let typeLine: String
         public let url: URL
-        
+
         enum CodingKeys: String, CodingKey {
             case identifier = "id"
             case component
@@ -100,7 +100,7 @@ public struct Card: Decodable {
             case url = "uri"
         }
     }
-    
+
     public struct CardFace: Decodable {
         public let artist: String?
         public let colorIndicator: [Color]?
@@ -119,7 +119,7 @@ public struct Card: Decodable {
         public let toughness: String?
         public let typeLine: String
         public let watermark: String?
-        
+
         enum CodingKeys: String, CodingKey {
             case artist
             case colorIndicator = "color_indicator"
@@ -140,7 +140,7 @@ public struct Card: Decodable {
             case watermark
         }
     }
-    
+
     public let allParts: [RelatedCard]?
 
     // MARK: - Decodeable
