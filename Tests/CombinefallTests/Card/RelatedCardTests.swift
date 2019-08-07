@@ -19,7 +19,7 @@ final class RelatedCardTests: XCTestCase {
         XCTAssert(Card.RelatedCard.CodingKeys(rawValue: "id") == .identifier, "CodingKey is of the wrong case")
     }
     
-    func testtypeLineCodingKey() {
+    func testTypeLineCodingKey() {
         XCTAssert(Card.RelatedCard.CodingKeys(rawValue: "type_line") == .typeLine, "CodingKey is of the wrong case")
     }
     
@@ -32,7 +32,7 @@ final class RelatedCardTests: XCTestCase {
         ("testComponentMeldResultRawValue", testComponentMeldResultRawValue),
         ("testComponentcomboPieceRawValue", testComponentcomboPieceRawValue),
         ("testIdentifierCodingKey", testIdentifierCodingKey),
-        ("testtypeLineCodingKey", testtypeLineCodingKey),
+        ("testTypeLineCodingKey", testTypeLineCodingKey),
         ("testUrlCodingKey", testUrlCodingKey)
     ]
 }
