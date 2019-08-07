@@ -4,7 +4,7 @@ import Foundation
 ///could obtain and add to their collection (with a few minor exceptions).
 public struct Card: Decodable {
 
-    //MARK: - Core Card Properties
+    // MARK: - Core Card Properties
     
     /// A language that a `Card` can be printed in.
     ///
@@ -75,8 +75,75 @@ public struct Card: Decodable {
     
     ///A link to this `Card` on Scryfall’s API.
     public let url: URL
+    
+    // MARK: - Gameplay Properties
+    
+    public struct RelatedCard: Decodable {
+        public enum Component: String, Decodable {
+            case token
+            case meldPart = "meld_part"
+            case meldResult = "meld_result"
+            case comboPiece = "combo_piece"
+        }
+        
+        public let identifier: UUID
+        public let component: Component
+        public let name: String
+        public let typeLine: String
+        public let url: URL
+        
+        enum CodingKeys: String, CodingKey {
+            case identifier = "id"
+            case component
+            case name
+            case typeLine = "type_line"
+            case url = "uri"
+        }
+    }
+    
+    public struct CardFace: Decodable {
+        public let artist: String?
+        public let colorIndicator: [Color]?
+        public let colors: [Color]?
+        public let flavorText: String?
+        public let illustrationIdentifier: UUID?
+        public let imageUrls: [URL]?
+        public let loyalty: String?
+        public let manaCost: String
+        public let name: String
+        public let oracleText: String?
+        public let power: String?
+        public let printedName: String?
+        public let printedText: String?
+        public let printedTypeLine: String?
+        public let toughness: String?
+        public let typeLine: String
+        public let watermark: String?
+        
+        enum CodingKeys: String, CodingKey {
+            case artist
+            case colorIndicator = "color_indicator"
+            case colors
+            case flavorText = "flavor_text"
+            case illustrationIdentifier = "illustration_id"
+            case imageUrls = "image_uris"
+            case loyalty
+            case manaCost = "mana_cost"
+            case name
+            case oracleText = "oracle_text"
+            case power
+            case printedName = "printed_name"
+            case printedText = "printed_text"
+            case printedTypeLine = "printed_type_line"
+            case toughness
+            case typeLine = "type_line"
+            case watermark
+        }
+    }
+    
+    public let allParts: [RelatedCard]?
 
-    //MARK: - Decodeable
+    // MARK: - Decodeable
     enum CodingKeys: String, CodingKey {
         case arenaIdentifier = "arena_id"
         case identifier
@@ -90,5 +157,6 @@ public struct Card: Decodable {
         case rulingsUrl = "rulings_uri"
         case scryfallUrl = "scryfall_uri"
         case url = "uri"
+        case allParts = "all_parts"
     }
 }
