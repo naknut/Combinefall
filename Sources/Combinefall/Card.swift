@@ -153,7 +153,7 @@ public struct Card: Decodable {
             case watermark
         }
     }
-    
+
     public enum Layout: String, Decodable {
         case normal
         case split
@@ -178,11 +178,13 @@ public struct Card: Decodable {
     public let cardFaces: [CardFace]?
     ///The card’s converted mana cost. Note that some funny cards have fractional mana costs.
     public let convertedManaCost: Double
-    ///This card’s colors, if the overall card has colors defined by the rules. Otherwise the colors will be on the `cardFaces`.
+    ///This card’s colors, if the overall card has colors defined by the rules.
+    ///Otherwise the colors will be on the `cardFaces`.
     public let colors: [Color]?
     ///This card’s color identity.
     public let colorIdentity: [Color]
-    ///The colors in this card’s color indicator, if any. A `nil` value for this property indicates the card does not have one.
+    ///The colors in this card’s color indicator, if any.
+    ///A `nil` value for this property indicates the card does not have one.
     public let colorIndicator: [Color]?
     ///This card’s overall rank/popularity on EDHREC. Not all cards are ranked.
     public let edhrecRank: Int?
@@ -194,7 +196,10 @@ public struct Card: Decodable {
     // TODO: Add legalities
     ///This card’s life modifier, if it is Vanguard card. This value will contain a delta, such as +2.
     public let lifeModifier: String?
-    ///The mana cost for this card. This value will be any empty string "" if the cost is absent. Remember that per the game rules, a missing mana cost and a mana cost of {0} are different values. Multi-faced cards will report this value in card faces.
+    ///The mana cost for this card. This value will be empty if the cost is absent.
+    ///
+    ///Remember that per the game rules, a missing mana cost and a mana cost of {0} are different values.
+    ///Multi-faced cards will report this value in card faces.
     public let manaCost: String?
     ///The name of this card. If this card has multiple faces, this field will contain both names separated by "//".
     public let name: String
@@ -209,7 +214,7 @@ public struct Card: Decodable {
     ///This card’s toughness, if any. Note that some cards have toughnesses that are not numeric, such as *.
     public let toughness: String?
     public let typeLine: String
-    
+
     // MARK: - Decodeable
     enum CodingKeys: String, CodingKey {
         case arenaIdentifier = "arena_id"
