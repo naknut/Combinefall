@@ -241,7 +241,7 @@ public struct Card: Decodable {
     // MARK: - Decodeable
     enum CodingKeys: String, CodingKey {
         case arenaIdentifier = "arena_id"
-        case identifier
+        case identifier = "id"
         case language = "lang"
         case magicOnlineIdentifier = "mtgo_id"
         case magicOnlineFoilIdentifier = "mtgo_foil_id"

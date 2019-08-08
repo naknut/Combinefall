@@ -9,6 +9,13 @@ final class CardTests: XCTestCase {
         )
     }
 
+    func testIdentifierCodingKey() {
+        XCTAssert(
+            Card.CodingKeys(rawValue: "id") == .identifier,
+            "CodingKey is not of the right case"
+        )
+    }
+
     func testLanguageCodingKey() {
         XCTAssert(
             Card.CodingKeys(rawValue: "lang") == .language,
