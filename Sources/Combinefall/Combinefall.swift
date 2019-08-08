@@ -199,7 +199,7 @@ where U.Output == String, U.Failure == Never {
 }
 
 public extension Publisher where Self.Output == String, Self.Failure == Never {
-    func card<S: Scheduler>(on scheduler: S) -> AnyPublisher<Card, Error> {
+    func card() -> AnyPublisher<Card, Error> {
         cardPublisher(upstream: self)
     }
 }
