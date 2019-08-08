@@ -4,12 +4,13 @@ import Foundation
 private let baseURLComponent: URLComponents = URLComponents(string: "https://api.scryfall.com/")!
 
 private enum EndpointComponents {
-    case autocomplete
+    case autocomplete, cardNamed
 
     var urlComponents: URLComponents {
         var urlComponent = baseURLComponent
         switch self {
         case .autocomplete: urlComponent.path = "/cards/autocomplete"
+        case .cardNamed: urlComponent.path = "/cards/named"
         }
         return urlComponent
     }
@@ -18,6 +19,8 @@ private enum EndpointComponents {
 public enum Error: Swift.Error {
     case network(underlying: URLError), decode(underlying: Swift.Error), scryfall(underlying: URLError)
 }
+
+// MARK: - Autocomplete
 
 // Used internaly to inject remote publisher for testing.
 // swiftlint:disable:next identifier_name
@@ -152,5 +155,56 @@ public extension Publisher where Self.Output == String, Self.Failure == Never {
     ///            20 full English card names that could be autocompletions of the given `upstream` published element.
     func autocomplete<S: Scheduler>(on scheduler: S) -> AnyPublisher<[String], Error> {
         autocompletePublisher(upstream: self, scheduler: scheduler)
+    }
+}
+
+// MARK: - Cards
+
+// Used internaly to inject remote publisher for testing.
+// swiftlint:disable:next identifier_name
+func _cardPublisher<U: Publisher, R: Publisher, S: Scheduler> (
+    upstream: U,
+    remotePublisherClosure: @escaping (URL) -> R, scheduler: S
+) -> AnyPublisher<Card, Combinefall.Error>
+where
+    U.Output == String,
+    U.Failure == Never,
+    R.Output == URLSession.DataTaskPublisher.Output,
+    R.Failure == URLSession.DataTaskPublisher.Failure {
+    upstream
+        .debounce(for: .milliseconds(100), scheduler: scheduler)
+        .removeDuplicates()
+        .setFailureType(to: URLSession.DataTaskPublisher.Failure.self)
+        .flatMap { cardName -> R in
+            var cardNamedComponents = EndpointComponents.cardNamed.urlComponents
+            cardNamedComponents.queryItems = [URLQueryItem(name: "exact", value: cardName)]
+            return remotePublisherClosure(cardNamedComponents.url!)
+        }
+        .map { $0.data }
+        .decode(type: Card.self, decoder: JSONDecoder())
+        .mapError { error -> Combinefall.Error in
+            if let urlError = error as? URLError {
+                if 400...500 ~= urlError.errorCode { return .scryfall(underlying: urlError) }
+                return .network(underlying: urlError)
+            }
+            return .decode(underlying: error)
+        }
+        .eraseToAnyPublisher()
+}
+
+public func cardPublisher<U: Publisher, S: Scheduler>(
+    upstream: U, scheduler: S
+) -> AnyPublisher<Card, Error>
+where U.Output == String, U.Failure == Never {
+    _cardPublisher(
+        upstream: upstream,
+        remotePublisherClosure: URLSession.shared.dataTaskPublisher,
+        scheduler: scheduler
+    )
+}
+
+public extension Publisher where Self.Output == String, Self.Failure == Never {
+    func card<S: Scheduler>(on scheduler: S) -> AnyPublisher<Card, Error> {
+        cardPublisher(upstream: self, scheduler: scheduler)
     }
 }
