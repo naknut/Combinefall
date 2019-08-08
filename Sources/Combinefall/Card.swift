@@ -153,10 +153,63 @@ public struct Card: Decodable {
             case watermark
         }
     }
+    
+    public enum Layout: String, Decodable {
+        case normal
+        case split
+        case flip
+        case transform
+        case meld
+        case leveler
+        case saga
+        case planar
+        case scheme
+        case vanguard
+        case token
+        case doubleFacedToken = "double_faced_token"
+        case emblem
+        case augment
+        case host
+    }
 
     ///If this card is closely related to other cards, this property will be set to an `[RelatedCard]`.
     public let allParts: [RelatedCard]?
-
+    ///An `[CardFace]`, if this card is multifaced.
+    public let cardFaces: [CardFace]?
+    ///The card’s converted mana cost. Note that some funny cards have fractional mana costs.
+    public let convertedManaCost: Double
+    ///This card’s colors, if the overall card has colors defined by the rules. Otherwise the colors will be on the `cardFaces`.
+    public let colors: [Color]?
+    ///This card’s color identity.
+    public let colorIdentity: [Color]
+    ///The colors in this card’s color indicator, if any. A `nil` value for this property indicates the card does not have one.
+    public let colorIndicator: [Color]?
+    ///This card’s overall rank/popularity on EDHREC. Not all cards are ranked.
+    public let edhrecRank: Int?
+    ///True if this printing exists in a foil version.
+    public let canBeFoil: Bool
+    ///This card’s hand modifier, if it is Vanguard card. This value will contain a delta, such as -1.
+    public let handModifier: String?
+    public let layout: Layout
+    // TODO: Add legalities
+    ///This card’s life modifier, if it is Vanguard card. This value will contain a delta, such as +2.
+    public let lifeModifier: String?
+    ///The mana cost for this card. This value will be any empty string "" if the cost is absent. Remember that per the game rules, a missing mana cost and a mana cost of {0} are different values. Multi-faced cards will report this value in card faces.
+    public let manaCost: String?
+    ///The name of this card. If this card has multiple faces, this field will contain both names separated by "//".
+    public let name: String
+    ///True if this printing exists in a nonfoil version.
+    public let canBeNonFoil: Bool
+    public let oracleText: String?
+    public let oversized: Bool
+    ///This card’s power, if any. Note that some cards have powers that are not numeric, such as *.
+    public let power: String?
+    ///True if this card is on the Reserved List.
+    public let reserved: Bool
+    ///This card’s toughness, if any. Note that some cards have toughnesses that are not numeric, such as *.
+    public let toughness: String?
+    public let typeLine: String
+    
     // MARK: - Decodeable
     enum CodingKeys: String, CodingKey {
         case arenaIdentifier = "arena_id"
@@ -172,5 +225,24 @@ public struct Card: Decodable {
         case scryfallUrl = "scryfall_uri"
         case url = "uri"
         case allParts = "all_parts"
+        case cardFaces = "card_faces"
+        case convertedManaCost = "cmc"
+        case colors
+        case colorIdentity = "color_identity"
+        case colorIndicator = "color_indicator"
+        case edhrecRank = "edhrec_rank"
+        case canBeFoil = "foil"
+        case handModifier = "hand_modifier"
+        case layout
+        case lifeModifier = "life_modifier"
+        case manaCost = "mana_cost"
+        case name
+        case canBeNonFoil = "nonfoil"
+        case oracleText = "oracle_text"
+        case oversized
+        case power
+        case reserved
+        case toughness
+        case typeLine = "type_line"
     }
 }
