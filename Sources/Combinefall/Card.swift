@@ -214,6 +214,29 @@ public struct Card: Decodable {
     ///This card’s toughness, if any. Note that some cards have toughnesses that are not numeric, such as *.
     public let toughness: String?
     public let typeLine: String
+    
+    // MARK: - Print properties
+    
+    public struct ImageUrls: Decodable {
+        public let small: URL?
+        public let normal: URL?
+        public let large: URL?
+        public let png: URL?
+        public let artCrop: URL?
+        public let borderCrop: URL?
+        
+        enum CodingKeys: String, CodingKey {
+            case small
+            case normal
+            case large
+            case png
+            case artCrop = "art_crop"
+            case borderCrop = "border_crop"
+        }
+    }
+    
+    public let imageUrls: ImageUrls
+    
 
     // MARK: - Decodeable
     enum CodingKeys: String, CodingKey {
@@ -249,5 +272,6 @@ public struct Card: Decodable {
         case reserved
         case toughness
         case typeLine = "type_line"
+        case imageUrls = "image_uris"
     }
 }
