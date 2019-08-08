@@ -165,6 +165,7 @@ final class CardTests: XCTestCase {
 
     static var allTests = [
         ("testArenaIdentifierCodingKey", testArenaIdentifierCodingKey),
+        ("testIdentifierCodingKey", testIdentifierCodingKey),
         ("testLanguageCodingKey", testLanguageCodingKey),
         ("testMagicOnlineIdentifierCodingKey", testMagicOnlineIdentifierCodingKey),
         ("testMagicOnlineFoilIdentifierCodingKey", testMagicOnlineFoilIdentifierCodingKey),
