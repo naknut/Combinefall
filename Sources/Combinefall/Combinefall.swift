@@ -162,9 +162,9 @@ public extension Publisher where Self.Output == String, Self.Failure == Never {
 
 // Used internaly to inject remote publisher for testing.
 // swiftlint:disable:next identifier_name
-func _cardPublisher<U: Publisher, R: Publisher, S: Scheduler> (
+func _cardPublisher<U: Publisher, R: Publisher> (
     upstream: U,
-    remotePublisherClosure: @escaping (URL) -> R, scheduler: S
+    remotePublisherClosure: @escaping (URL) -> R
 ) -> AnyPublisher<Card, Combinefall.Error>
 where
     U.Output == String,
@@ -172,8 +172,6 @@ where
     R.Output == URLSession.DataTaskPublisher.Output,
     R.Failure == URLSession.DataTaskPublisher.Failure {
     upstream
-        .debounce(for: .milliseconds(100), scheduler: scheduler)
-        .removeDuplicates()
         .setFailureType(to: URLSession.DataTaskPublisher.Failure.self)
         .flatMap { cardName -> R in
             var cardNamedComponents = EndpointComponents.cardNamed.urlComponents
@@ -192,19 +190,16 @@ where
         .eraseToAnyPublisher()
 }
 
-public func cardPublisher<U: Publisher, S: Scheduler>(
-    upstream: U, scheduler: S
-) -> AnyPublisher<Card, Error>
+public func cardPublisher<U: Publisher>(upstream: U) -> AnyPublisher<Card, Error>
 where U.Output == String, U.Failure == Never {
     _cardPublisher(
         upstream: upstream,
-        remotePublisherClosure: URLSession.shared.dataTaskPublisher,
-        scheduler: scheduler
+        remotePublisherClosure: URLSession.shared.dataTaskPublisher
     )
 }
 
 public extension Publisher where Self.Output == String, Self.Failure == Never {
     func card<S: Scheduler>(on scheduler: S) -> AnyPublisher<Card, Error> {
-        cardPublisher(upstream: self, scheduler: scheduler)
+        cardPublisher(upstream: self)
     }
 }
