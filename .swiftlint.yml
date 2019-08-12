@@ -1,2 +1,5 @@
 disabled_rules:
   nesting
+
+excluded:
+  - Tests/CombinefallTests/TestData.swift

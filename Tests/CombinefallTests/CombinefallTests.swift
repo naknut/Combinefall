@@ -5,12 +5,14 @@ import Combine
 final class CombinefallTests: XCTestCase {
     private struct URLSessionMockPublisher: Publisher {
         let testData: TestData
-        
+
         typealias Output = URLSession.DataTaskPublisher.Output
         typealias Failure = URLSession.DataTaskPublisher.Failure
 
         func receive<S>(subscriber: S) where S: Subscriber, Failure == S.Failure, Output == S.Input {
-            subscriber.receive(subscription: URLSessionMockPublisherSubscription(subscriber: subscriber, testData: testData))
+            subscriber.receive(
+                subscription: URLSessionMockPublisherSubscription(subscriber: subscriber, testData: testData)
+            )
         }
     }
 
@@ -142,10 +144,26 @@ final class CombinefallTests: XCTestCase {
         wait(for: [expectation], timeout: 10.0)
     }
 
+    func testCard() {
+        print(TestData.card.rawValue)
+        let valueExpectation = XCTestExpectation(description: "Let publisher publish")
+        let completionExpectation = XCTestExpectation(description: "Let publisher finish")
+        cancellable = _cardPublisher(
+                upstream: $testUpstream,
+                remotePublisherClosure: { (_: URL) in URLSessionMockPublisher(testData: TestData.card) }
+            )
+            .sink(
+                receiveCompletion: { _ in completionExpectation.fulfill() },
+                receiveValue: { _ in valueExpectation.fulfill() }
+            )
+        wait(for: [valueExpectation, completionExpectation], timeout: 10.0)
+    }
+
     static var allTests = [
         ("testAutocompleteCatalog", testAutocompleteCatalog),
         ("testAutocomplete", testAutocomplete),
         ("testNetworkError", testNetworkError),
-        ("testDecodeError", testDecodeError)
+        ("testDecodeError", testDecodeError),
+        ("testCard", testCard)
     ]
 }
