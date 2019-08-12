@@ -172,6 +172,7 @@ where
     R.Output == URLSession.DataTaskPublisher.Output,
     R.Failure == URLSession.DataTaskPublisher.Failure {
     upstream
+        .first()
         .setFailureType(to: URLSession.DataTaskPublisher.Failure.self)
         .flatMap { cardName -> R in
             var cardNamedComponents = EndpointComponents.cardNamed.urlComponents
