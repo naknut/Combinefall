@@ -4,24 +4,28 @@ import Combine
 
 final class CombinefallTests: XCTestCase {
     private struct URLSessionMockPublisher: Publisher {
+        let testData: TestData
+        
         typealias Output = URLSession.DataTaskPublisher.Output
         typealias Failure = URLSession.DataTaskPublisher.Failure
 
         func receive<S>(subscriber: S) where S: Subscriber, Failure == S.Failure, Output == S.Input {
-            subscriber.receive(subscription: URLSessionMockPublisherSubscription(subscriber: subscriber))
+            subscriber.receive(subscription: URLSessionMockPublisherSubscription(subscriber: subscriber, testData: testData))
         }
     }
 
     private class URLSessionMockPublisherSubscription<S: Subscriber>: Subscription
     where S.Input == URLSessionMockPublisher.Output {
         var subscriber: S?
+        let testData: TestData
 
-        init(subscriber: S) {
+        init(subscriber: S, testData: TestData) {
             self.subscriber = subscriber
+            self.testData = testData
         }
 
         func request(_ demand: Subscribers.Demand) {
-            _ = subscriber?.receive((TestData.catalog.data, URLResponse()))
+            _ = subscriber?.receive((testData.data, URLResponse()))
             subscriber?.receive(completion: .finished)
         }
 
@@ -55,33 +59,6 @@ final class CombinefallTests: XCTestCase {
         }
     }
 
-    private struct BadDataMockPublisher: Publisher {
-        typealias Output = URLSession.DataTaskPublisher.Output
-        typealias Failure = URLSession.DataTaskPublisher.Failure
-
-        func receive<S>(subscriber: S) where S: Subscriber, Failure == S.Failure, Output == S.Input {
-            subscriber.receive(subscription: BadDataSubscription(subscriber: subscriber))
-        }
-    }
-
-    private class BadDataSubscription<S: Subscriber>: Subscription
-    where S.Input == FailingURLSessionMockPublisher.Output, S.Failure == FailingURLSessionMockPublisher.Failure {
-        var subscriber: S?
-
-        init(subscriber: S) {
-            self.subscriber = subscriber
-        }
-
-        func request(_ demand: Subscribers.Demand) {
-            _ = subscriber?.receive((TestData.invalid.data, URLResponse()))
-            subscriber?.receive(completion: .finished)
-        }
-
-        func cancel() {
-            subscriber = nil
-        }
-    }
-
     @Published var testUpstream: String = ""
     var cancellable: AnyCancellable?
 
@@ -89,7 +66,7 @@ final class CombinefallTests: XCTestCase {
         let expectation = XCTestExpectation(description: "Let publisher publish")
         cancellable = _autocompleteCatalogPublisher(
                 upstream: $testUpstream,
-                remotePublisherClosure: { (_: URL) in URLSessionMockPublisher() },
+                remotePublisherClosure: { (_: URL) in URLSessionMockPublisher(testData: TestData.catalog) },
                 scheduler: RunLoop.current
             )
             .assertNoFailure()
@@ -107,7 +84,7 @@ final class CombinefallTests: XCTestCase {
         let expectation = XCTestExpectation(description: "Let publisher publish")
         cancellable = _autocompletePublisher(
                 upstream: $testUpstream,
-                remotePublisherClosure: { (_: URL) in URLSessionMockPublisher() },
+                remotePublisherClosure: { (_: URL) in URLSessionMockPublisher(testData: TestData.catalog) },
                 scheduler: RunLoop.current
             )
             .assertNoFailure()
@@ -150,7 +127,7 @@ final class CombinefallTests: XCTestCase {
         let expectation = XCTestExpectation(description: "Let publisher publish")
         cancellable = _autocompletePublisher(
                 upstream: $testUpstream,
-                remotePublisherClosure: { (_: URL) in BadDataMockPublisher() },
+                remotePublisherClosure: { (_: URL) in URLSessionMockPublisher(testData: TestData.invalid) },
                 scheduler: RunLoop.current
             )
             .sink(
