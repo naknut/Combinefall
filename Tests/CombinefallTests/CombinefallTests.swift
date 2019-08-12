@@ -15,19 +15,13 @@ final class CombinefallTests: XCTestCase {
     private class URLSessionMockPublisherSubscription<S: Subscriber>: Subscription
     where S.Input == URLSessionMockPublisher.Output {
         var subscriber: S?
-        let testData = """
-            {
-                "total_values": 1,
-                "data": ["Jace"]
-            }
-            """.data(using: .utf8)!
 
         init(subscriber: S) {
             self.subscriber = subscriber
         }
 
         func request(_ demand: Subscribers.Demand) {
-            _ = subscriber?.receive((testData, URLResponse()))
+            _ = subscriber?.receive((TestData.catalog.data, URLResponse()))
             subscriber?.receive(completion: .finished)
         }
 
@@ -73,18 +67,13 @@ final class CombinefallTests: XCTestCase {
     private class BadDataSubscription<S: Subscriber>: Subscription
     where S.Input == FailingURLSessionMockPublisher.Output, S.Failure == FailingURLSessionMockPublisher.Failure {
         var subscriber: S?
-        let testData = """
-            {
-                "total_values": 1,
-                "data": ["Jace"]
-            """.data(using: .utf8)!
 
         init(subscriber: S) {
             self.subscriber = subscriber
         }
 
         func request(_ demand: Subscribers.Demand) {
-            _ = subscriber?.receive((testData, URLResponse()))
+            _ = subscriber?.receive((TestData.invalid.data, URLResponse()))
             subscriber?.receive(completion: .finished)
         }
 
