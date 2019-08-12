@@ -158,12 +158,57 @@ final class CombinefallTests: XCTestCase {
             )
         wait(for: [valueExpectation, completionExpectation], timeout: 10.0)
     }
+    
+    func testCardNetworkError() {
+        let expectation = XCTestExpectation(description: "Let publisher publish")
+        cancellable = _cardPublisher(
+                upstream: $testUpstream,
+                remotePublisherClosure: { (_: URL) in FailingURLSessionMockPublisher() }
+            )
+            .sink(
+                receiveCompletion: {
+                    defer { expectation.fulfill() }
+                    guard case let .failure(combinefallError) = $0 else { XCTFail("Publisher didnt fail"); return }
+                    guard case let .network(underlying: urlError) = combinefallError else {
+                        XCTFail("Publisher sent wrong error")
+                        return
+                    }
+                    guard urlError == URLError(.cannotDecodeRawData) else {
+                        XCTFail("Underlying error not matching")
+                        return
+                    }
+                },
+                receiveValue: { _ in }
+            )
+        testUpstream = "Foo"
+        wait(for: [expectation], timeout: 10.0)
+    }
+    
+    func testCardDecodeError() {
+        let expectation = XCTestExpectation(description: "Let publisher publish")
+        cancellable = _cardPublisher(
+                upstream: $testUpstream,
+                remotePublisherClosure: { (_: URL) in URLSessionMockPublisher(testData: TestData.invalid) }
+            )
+            .sink(
+                receiveCompletion: {
+                    defer { expectation.fulfill() }
+                    guard case let .failure(combinefallError) = $0 else { XCTFail("Publisher didnt fail"); return }
+                    guard case .decode = combinefallError else { XCTFail("Publisher sent wrong error"); return }
+                },
+                receiveValue: { _ in }
+            )
+        testUpstream = "Foo"
+        wait(for: [expectation], timeout: 10.0)
+    }
 
     static var allTests = [
         ("testAutocompleteCatalog", testAutocompleteCatalog),
         ("testAutocomplete", testAutocomplete),
         ("testNetworkError", testNetworkError),
         ("testDecodeError", testDecodeError),
-        ("testCard", testCard)
+        ("testCard", testCard),
+        ("testCardNetworkError", testCardNetworkError),
+        ("testCardDecodeError", testCardDecodeError)
     ]
 }
