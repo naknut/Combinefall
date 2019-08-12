@@ -25,14 +25,13 @@ public enum Error: Swift.Error {
 // Used internaly to inject remote publisher for testing.
 // swiftlint:disable:next identifier_name
 func _autocompleteCatalogPublisher<U: Publisher, R: Publisher, S: Scheduler> (
-    upstream: U,
-    remotePublisherClosure: @escaping (URL) -> R, scheduler: S
+    upstream: U, remotePublisherClosure: @escaping (URL) -> R, scheduler: S
 ) -> AnyPublisher<AutocompleteCatalog, Combinefall.Error>
 where
-    U.Output == String,
-    U.Failure == Never,
-    R.Output == URLSession.DataTaskPublisher.Output,
-    R.Failure == URLSession.DataTaskPublisher.Failure {
+U.Output == String,
+U.Failure == Never,
+R.Output == URLSession.DataTaskPublisher.Output,
+R.Failure == URLSession.DataTaskPublisher.Failure {
     upstream
         .debounce(for: .milliseconds(100), scheduler: scheduler)
         .removeDuplicates()
