@@ -78,7 +78,6 @@ final class CombinefallTests: XCTestCase {
                 XCTAssert(catalog.data.first == "Jace")
                 expectation.fulfill()
             }
-        testUpstream = "Foo"
         wait(for: [expectation], timeout: 10.0)
     }
 
@@ -95,7 +94,6 @@ final class CombinefallTests: XCTestCase {
                 XCTAssert(list.first == "Jace")
                 expectation.fulfill()
             }
-        testUpstream = "Foo"
         wait(for: [expectation], timeout: 10.0)
     }
 
@@ -121,7 +119,6 @@ final class CombinefallTests: XCTestCase {
                 },
                 receiveValue: { _ in }
             )
-        testUpstream = "Foo"
         wait(for: [expectation], timeout: 10.0)
     }
 
@@ -158,7 +155,7 @@ final class CombinefallTests: XCTestCase {
             )
         wait(for: [valueExpectation, completionExpectation], timeout: 10.0)
     }
-    
+
     func testCardNetworkError() {
         let expectation = XCTestExpectation(description: "Let publisher publish")
         cancellable = _cardPublisher(
@@ -180,10 +177,9 @@ final class CombinefallTests: XCTestCase {
                 },
                 receiveValue: { _ in }
             )
-        testUpstream = "Foo"
         wait(for: [expectation], timeout: 10.0)
     }
-    
+
     func testCardDecodeError() {
         let expectation = XCTestExpectation(description: "Let publisher publish")
         cancellable = _cardPublisher(
@@ -198,7 +194,6 @@ final class CombinefallTests: XCTestCase {
                 },
                 receiveValue: { _ in }
             )
-        testUpstream = "Foo"
         wait(for: [expectation], timeout: 10.0)
     }
 

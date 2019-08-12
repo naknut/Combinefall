@@ -2,7 +2,11 @@ import Foundation
 
 ///Represent individual _Magic: The Gathering_ cards that players
 ///could obtain and add to their collection (with a few minor exceptions).
-public struct Card: Decodable {
+public struct Card: ScryfallModel {
+
+    // MARK: - ScryfallModel
+
+    let object: String
 
     // MARK: - Core Card Properties
 
@@ -239,6 +243,7 @@ public struct Card: Decodable {
 
     // MARK: - Decodeable
     enum CodingKeys: String, CodingKey {
+        case object
         case arenaIdentifier = "arena_id"
         case identifier = "id"
         case language = "lang"

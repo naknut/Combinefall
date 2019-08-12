@@ -3,6 +3,7 @@ import Foundation
 enum TestData: String {
     case catalog = """
     {
+        "object": "catalog",
         "total_values": 1,
         "data": ["Jace"]
     }
@@ -10,6 +11,7 @@ enum TestData: String {
 
     case invalid = """
     {
+        "object": "catalog",
         "total_values": 1,
         "data": ["Jace"]
     """
@@ -115,5 +117,5 @@ enum TestData: String {
     }
     """#
 
-    var data: Data { self.rawValue.data(using: .utf8, allowLossyConversion: false)! }
+    var data: Data { self.rawValue.data(using: .utf8)! }
 }

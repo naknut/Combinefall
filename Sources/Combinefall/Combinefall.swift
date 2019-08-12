@@ -20,6 +20,28 @@ public enum Error: Swift.Error {
     case network(underlying: URLError), decode(underlying: Swift.Error), scryfall(underlying: URLError)
 }
 
+func fetchPublisher<U: Publisher, R: Publisher, S: ScryfallModel> (
+    upstream: U, remotePublisherClosure: @escaping (URL) -> R
+) -> AnyPublisher<S, Error>
+where
+U.Output == URL,
+U.Failure == Never,
+R.Output == URLSession.DataTaskPublisher.Output,
+R.Failure == URLSession.DataTaskPublisher.Failure {
+    upstream
+        .setFailureType(to: URLSession.DataTaskPublisher.Failure.self)
+        .flatMap { url -> R in return remotePublisherClosure(url) }
+        .map { $0.data }
+        .decode(type: S.self, decoder: JSONDecoder())
+        .mapError { error -> Combinefall.Error in
+            if let urlError = error as? URLError {
+                if 400...500 ~= urlError.errorCode { return .scryfall(underlying: urlError) }
+                return .network(underlying: urlError)
+            }
+            return .decode(underlying: error)
+        }.eraseToAnyPublisher()
+}
+
 // MARK: - Autocomplete
 
 // Used internaly to inject remote publisher for testing.
@@ -32,25 +54,17 @@ U.Output == String,
 U.Failure == Never,
 R.Output == URLSession.DataTaskPublisher.Output,
 R.Failure == URLSession.DataTaskPublisher.Failure {
-    upstream
-        .debounce(for: .milliseconds(100), scheduler: scheduler)
-        .removeDuplicates()
-        .setFailureType(to: URLSession.DataTaskPublisher.Failure.self)
-        .flatMap { searchTerm -> R in
-            var autoCompleteComponents = EndpointComponents.autocomplete.urlComponents
-            autoCompleteComponents.queryItems = [URLQueryItem(name: "q", value: searchTerm)]
-            return remotePublisherClosure(autoCompleteComponents.url!)
-        }
-        .map { $0.data }
-        .decode(type: AutocompleteCatalog.self, decoder: JSONDecoder())
-        .mapError { error -> Combinefall.Error in
-            if let urlError = error as? URLError {
-                if 400...500 ~= urlError.errorCode { return .scryfall(underlying: urlError) }
-                return .network(underlying: urlError)
-            }
-            return .decode(underlying: error)
-        }
-        .eraseToAnyPublisher()
+    fetchPublisher(
+        upstream: upstream
+            .debounce(for: .milliseconds(100), scheduler: scheduler)
+            .removeDuplicates()
+            .map { searchTerm -> URL in
+                var autoCompleteComponents = EndpointComponents.autocomplete.urlComponents
+                autoCompleteComponents.queryItems = [URLQueryItem(name: "q", value: searchTerm)]
+                return autoCompleteComponents.url!
+            },
+        remotePublisherClosure: remotePublisherClosure
+    )
 }
 
 /// Creates a publisher connected to upstream that queries the autocomplete endpoint of Scryfall.
@@ -84,17 +98,17 @@ func _autocompletePublisher<U: Publisher, R: Publisher, S: Scheduler>(
     upstream: U, remotePublisherClosure: @escaping (URL) -> R, scheduler: S
 ) -> AnyPublisher<[String], Error>
 where
-    U.Output == String,
-    U.Failure == Never,
-    R.Output == URLSession.DataTaskPublisher.Output,
-    R.Failure == URLSession.DataTaskPublisher.Failure {
+U.Output == String,
+U.Failure == Never,
+R.Output == URLSession.DataTaskPublisher.Output,
+R.Failure == URLSession.DataTaskPublisher.Failure {
     _autocompleteCatalogPublisher(
         upstream: upstream,
         remotePublisherClosure: remotePublisherClosure,
         scheduler: scheduler
     )
-        .map { $0.data }
-        .eraseToAnyPublisher()
+    .map { $0.data }
+    .eraseToAnyPublisher()
 }
 
 /// Creates a publisher connected to upstream that queries the autocomplete endpoint of Scryfall.
@@ -166,28 +180,20 @@ func _cardPublisher<U: Publisher, R: Publisher> (
     remotePublisherClosure: @escaping (URL) -> R
 ) -> AnyPublisher<Card, Combinefall.Error>
 where
-    U.Output == String,
-    U.Failure == Never,
-    R.Output == URLSession.DataTaskPublisher.Output,
-    R.Failure == URLSession.DataTaskPublisher.Failure {
-    upstream
-        .first()
-        .setFailureType(to: URLSession.DataTaskPublisher.Failure.self)
-        .flatMap { cardName -> R in
-            var cardNamedComponents = EndpointComponents.cardNamed.urlComponents
-            cardNamedComponents.queryItems = [URLQueryItem(name: "exact", value: cardName)]
-            return remotePublisherClosure(cardNamedComponents.url!)
-        }
-        .map { $0.data }
-        .decode(type: Card.self, decoder: JSONDecoder())
-        .mapError { error -> Combinefall.Error in
-            if let urlError = error as? URLError {
-                if 400...500 ~= urlError.errorCode { return .scryfall(underlying: urlError) }
-                return .network(underlying: urlError)
-            }
-            return .decode(underlying: error)
-        }
-        .eraseToAnyPublisher()
+U.Output == String,
+U.Failure == Never,
+R.Output == URLSession.DataTaskPublisher.Output,
+R.Failure == URLSession.DataTaskPublisher.Failure {
+    fetchPublisher(
+        upstream: upstream
+            .first()
+            .map { cardName -> URL in
+                var cardNamedComponents = EndpointComponents.cardNamed.urlComponents
+                cardNamedComponents.queryItems = [URLQueryItem(name: "exact", value: cardName)]
+                return cardNamedComponents.url!
+            },
+        remotePublisherClosure: remotePublisherClosure
+    )
 }
 
 public func cardPublisher<U: Publisher>(upstream: U) -> AnyPublisher<Card, Error>
