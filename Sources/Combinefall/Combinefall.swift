@@ -176,8 +176,7 @@ public extension Publisher where Self.Output == String, Self.Failure == Never {
 // Used internaly to inject remote publisher for testing.
 // swiftlint:disable:next identifier_name
 func _cardPublisher<U: Publisher, R: Publisher> (
-    upstream: U,
-    remotePublisherClosure: @escaping (URL) -> R
+    upstream: U, remotePublisherClosure: @escaping (URL) -> R
 ) -> AnyPublisher<Card, Combinefall.Error>
 where
 U.Output == String,
