@@ -261,7 +261,77 @@ public struct Card: ScryfallModel {
         }
     }
 
+    public enum BorderColor: String, Decodable {
+        case black, borderless, gold, silver, white
+    }
+
+    public enum FrameEffect: String, Decodable {
+        case legendary
+        case miracle
+        case nyxtouched
+        case draft
+        case devoid
+        case tombstone
+        case colorshifted
+        case sunAndMoonDoubleFaceCard = "sunmoondfc"
+        case compassLandDoubleFaceCard = "compasslanddfc"
+        case originsPlaneswalkerDoubleFaceCard = "originpwdfc"
+        case moonEldraziDoubleFaceCard = "mooneldrazidfc"
+    }
+
+    public enum Frame: String, Decodable {
+        case nineteenNinetyThree = "1993"
+        case nineteenNinetySeven = "1997"
+        case twentyOThree = "2003"
+        case twentyFifteen = "2015"
+        case future
+    }
+
+    public enum Game: String, Decodable {
+        case paper, arena, magicOnline = "mtgo"
+    }
+
+    public enum Rarity: String, Decodable {
+        case common, uncommon, rare, mythic
+    }
+
+    ///The name of the illustrator of this card. Newly spoiled cards may not have this field yet.
+    public let artist: String?
+    public let canBeFoundInBooster: Bool
+    public let borderColor: BorderColor
+    public let cardBackIdentifier: UUID
+    public let collectorNumber: String
+    public let isDigital: Bool
+    public let flavorText: String?
+    public let frameEffect: FrameEffect?
+    public let frame: Frame
+    public let fullArt: Bool
+    public let availableIn: [Game]
+    public let hasHighResolutionImage: Bool
+    public let illustrationIdentifier: UUID
     public let imageUrls: ImageUrls
+    // TODO: Add prices
+    public let printedName: String?
+    public let printedText: String?
+    public let printedTypeLine: String?
+    public let isPromo: Bool
+    public let promoTypes: [String]?
+    // TODO: Add purchase_uris
+    public let rarity: Rarity
+    // TODO: Add related_uris
+    // TODO: Add released_at
+    public let isReprint: Bool
+    public let scryfallSetUrl: URL
+    public let setName: String
+    public let setSearchUrl: URL
+    public let setType: String
+    public let setUrl: URL
+    public let setCode: String
+    public let isStorySpotlight: Bool
+    public let isTextless: Bool
+    public let isVariation: Bool
+    public let isVariationOfCardWithIdentifier: UUID?
+    public let hasWatermark: Bool?
 
     // MARK: - Decodeable
     enum CodingKeys: String, CodingKey {
@@ -299,6 +369,37 @@ public struct Card: ScryfallModel {
         case reserved
         case toughness
         case typeLine = "type_line"
+        case artist
+        case canBeFoundInBooster = "booster"
+        case borderColor = "border_color"
+        case cardBackIdentifier = "card_back_id"
+        case collectorNumber = "collector_number"
+        case isDigital = "digital"
+        case flavorText = "flavor_text"
+        case frameEffect = "frame_effect"
+        case frame
+        case fullArt = "full_art"
+        case availableIn = "games"
+        case hasHighResolutionImage = "highres_image"
+        case illustrationIdentifier = "illustration_id"
         case imageUrls = "image_uris"
+        case printedName = "printed_name"
+        case printedText = "printed_text"
+        case printedTypeLine = "printed_type_line"
+        case isPromo = "promo"
+        case promoTypes = "promo_types"
+        case rarity
+        case isReprint = "reprint"
+        case scryfallSetUrl = "scryfall_set_uri"
+        case setName = "set_name"
+        case setSearchUrl = "set_search_uri"
+        case setType = "set_type"
+        case setUrl = "set_uri"
+        case setCode = "set"
+        case isStorySpotlight = "story_spotlight"
+        case isTextless = "textless"
+        case isVariation = "variation"
+        case isVariationOfCardWithIdentifier = "variation_of"
+        case hasWatermark = "watermark"
     }
 }

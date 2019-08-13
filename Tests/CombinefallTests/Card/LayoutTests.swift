@@ -8,7 +8,7 @@ final class LayoutTests: XCTestCase {
             "Language is not of the right case"
         )
     }
-    
+
     static var allTests = [
         ("testDoubleFacedTokenRawValue", testDoubleFacedTokenRawValue)
     ]

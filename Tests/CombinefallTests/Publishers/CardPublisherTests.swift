@@ -7,7 +7,6 @@ final class CardPublisherTests: XCTestCase {
     var cancellable: AnyCancellable?
 
     func testCard() {
-        print(TestData.card.rawValue)
         let valueExpectation = XCTestExpectation(description: "Let publisher publish")
         let completionExpectation = XCTestExpectation(description: "Let publisher finish")
         cancellable = _cardPublisher(
