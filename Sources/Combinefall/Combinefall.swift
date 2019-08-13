@@ -30,7 +30,7 @@ R.Output == URLSession.DataTaskPublisher.Output,
 R.Failure == URLSession.DataTaskPublisher.Failure {
     upstream
         .setFailureType(to: URLSession.DataTaskPublisher.Failure.self)
-        .flatMap { url -> R in return remotePublisherClosure(url) }
+        .flatMap { url -> R in remotePublisherClosure(url) }
         .map { $0.data }
         .decode(type: S.self, decoder: JSONDecoder())
         .mapError { error -> Combinefall.Error in
