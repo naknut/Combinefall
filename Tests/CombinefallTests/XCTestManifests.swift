@@ -9,6 +9,7 @@ public func allTests() -> [XCTestCaseEntry] {
         testCase(RelatedCardTests.allTests),
         testCase(CardFaceTests.allTests),
         testCase(LayoutTests.allTests),
+        testCase(LegalityTests.allTests),
         testCase(AutocompleteTests.allTests),
         testCase(CardPublisherTests.allTests),
         testCase(FetchPublisherTests.allTests)
