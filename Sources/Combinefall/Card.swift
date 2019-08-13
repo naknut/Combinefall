@@ -2,6 +2,7 @@ import Foundation
 
 ///Represent individual _Magic: The Gathering_ cards that players
 ///could obtain and add to their collection (with a few minor exceptions).
+// swiftlint:disable:next type_body_length
 public struct Card: ScryfallModel {
 
     // MARK: - ScryfallModel
@@ -402,4 +403,5 @@ public struct Card: ScryfallModel {
         case isVariationOfCardWithIdentifier = "variation_of"
         case hasWatermark = "watermark"
     }
+// swiftlint:disable:next file_length
 }
