@@ -176,6 +176,27 @@ public struct Card: ScryfallModel {
         case host
     }
 
+    public struct Legalities: Decodable {
+        public enum Legality: String, Decodable {
+            case legal
+            case notLegal = "not_legal"
+            case restricted
+            case banned
+        }
+
+        public let standard: Legality
+        public let future: Legality
+        public let modern: Legality
+        public let legacy: Legality
+        public let pauper: Legality
+        public let vintage: Legality
+        public let penny: Legality
+        public let commander: Legality
+        public let brawl: Legality
+        public let duel: Legality
+        public let oldschool: Legality
+    }
+
     ///If this card is closely related to other cards, this property will be set to an `[RelatedCard]`.
     public let allParts: [RelatedCard]?
     ///An `[CardFace]`, if this card is multifaced.
@@ -197,7 +218,8 @@ public struct Card: ScryfallModel {
     ///This card’s hand modifier, if it is Vanguard card. This value will contain a delta, such as -1.
     public let handModifier: String?
     public let layout: Layout
-    // TODO: Add legalities
+    ///Legality of this card across play formats.
+    public let legalities: Legalities
     ///This card’s life modifier, if it is Vanguard card. This value will contain a delta, such as +2.
     public let lifeModifier: String?
     ///The mana cost for this card. This value will be empty if the cost is absent.
@@ -266,6 +288,7 @@ public struct Card: ScryfallModel {
         case canBeFoil = "foil"
         case handModifier = "hand_modifier"
         case layout
+        case legalities
         case lifeModifier = "life_modifier"
         case manaCost = "mana_cost"
         case name
