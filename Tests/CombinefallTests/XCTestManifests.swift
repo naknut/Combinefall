@@ -4,7 +4,6 @@ import XCTest
 public func allTests() -> [XCTestCaseEntry] {
     return [
         testCase(CatalogTests.allTests),
-        testCase(CardTests.allTests),
         testCase(LanguageTests.allTests),
         testCase(RelatedCardTests.allTests),
         testCase(CardFaceTests.allTests),
@@ -16,7 +15,10 @@ public func allTests() -> [XCTestCaseEntry] {
         testCase(FrameEffectTests.allTests),
         testCase(FrameTests.allTests),
         testCase(GameTests.allTests),
-        testCase(PricesTests.allTests)
+        testCase(PricesTests.allTests),
+        testCase(CoreCardPropertiesTests.allTests),
+        testCase(GameplayPropertiestTests.allTests),
+        testCase(PrintPropertiestTests.allTests),
     ]
 }
 #endif

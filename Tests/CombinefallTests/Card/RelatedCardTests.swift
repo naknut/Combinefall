@@ -2,7 +2,6 @@ import XCTest
 @testable import Combinefall
 
 final class RelatedCardTests: XCTestCase {
-
     func testComponentMeldPartRawValue() {
         XCTAssert(Card.RelatedCard.Component(rawValue: "meld_part") == .meldPart, "Enum is of wrong case.")
     }
