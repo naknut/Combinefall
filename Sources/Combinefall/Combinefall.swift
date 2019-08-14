@@ -139,6 +139,7 @@ where U.Output == String, U.Failure == Never {
 public extension Publisher where Self.Output == String, Self.Failure == Never {
 
     /// Queries the autocomplete endpoint of Scryfall.
+    ///
     /// This function is designed for creating assistive UI elements that allow users to free-type card names.
     ///
     /// The names are sorted with the nearest match first, highly favoring results that begin with your given string.
@@ -195,6 +196,13 @@ R.Failure == URLSession.DataTaskPublisher.Failure {
     )
 }
 
+/// Creates a publisher connected to upstream that queries the `card/named` endpoint of Scryfall.
+///
+/// Names are case-insensitive and punctuation is optional (you can drop apostrophes and periods etc).
+/// For example: `"fIReBALL"` is the same as `"Fireball"` and `"smugglers copter"` is the same as `"Smuggler's Copter"`.
+///
+/// - Parameter upstream: _Required_ A publisher which `Output` must be `String`.
+/// - Returns: A publisher that publishes a `Card` mathing the given `upstream` published element.
 public func cardPublisher<U: Publisher>(upstream: U) -> AnyPublisher<Card, Error>
 where U.Output == String, U.Failure == Never {
     _cardPublisher(
@@ -204,6 +212,13 @@ where U.Output == String, U.Failure == Never {
 }
 
 public extension Publisher where Self.Output == String, Self.Failure == Never {
+    /// Queries the `card/named` endpoint of Scryfall.
+    ///
+    /// Names are case-insensitive and punctuation is optional (you can drop apostrophes and periods etc).
+    /// For example: `"fIReBALL"` is the same as `"Fireball"`
+    /// and `"smugglers copter"` is the same as `"Smuggler's Copter"`.
+    ///
+    /// - Returns: A publisher that publishes a `Card` mathing the given `upstream` published element.
     func card() -> AnyPublisher<Card, Error> {
         cardPublisher(upstream: self)
     }
