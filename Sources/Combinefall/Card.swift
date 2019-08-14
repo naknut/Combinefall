@@ -296,43 +296,100 @@ public struct Card: ScryfallModel {
         case common, uncommon, rare, mythic
     }
 
+    public struct Prices: Decodable {
+        public let unitedStatesDollar: String?
+        public let unitedStatesDollarFoil: String?
+        public let euro: String?
+        public let magicOnlineEventTicket: String?
+
+        enum CodingKeys: String, CodingKey {
+            case unitedStatesDollar = "usd"
+            case unitedStatesDollarFoil = "usd_foil"
+            case euro = "eur"
+            case magicOnlineEventTicket = "tix"
+        }
+    }
+
+    public struct PurchaseUrls: Decodable {
+        public let tcgplayer: URL
+        public let cardmarket: URL
+        public let cardhoarder: URL
+    }
+
+    public struct RelatedUrls: Decodable {
+        public let gatherer: URL
+        public let tcgplayerDecks: URL
+        public let edhrec: URL
+        public let mtgtop8: URL
+
+        enum CodingKeys: String, CodingKey {
+            case gatherer
+            case tcgplayerDecks = "tcgplayer_decks"
+            case edhrec
+            case mtgtop8
+        }
+    }
+
     ///The name of the illustrator of this card. Newly spoiled cards may not have this field yet.
     public let artist: String?
     public let canBeFoundInBooster: Bool
     public let borderColor: BorderColor
+    ///The Scryfall ID for the card back design present on this card.
     public let cardBackIdentifier: UUID
+    ///This card’s collector number.
+    ///
+    ///Note that collector numbers can contain non-numeric characters, such as letters or *.
     public let collectorNumber: String
+    ///True if this is a digital card on Magic Online.
     public let isDigital: Bool
     public let flavorText: String?
     public let frameEffect: FrameEffect?
     public let frame: Frame
+    ///True if this card’s artwork is larger than normal.
     public let fullArt: Bool
+    ///A `[Game]` that this card print is available in,
     public let availableIn: [Game]
+    ///True if this card’s imagery is high resolution.
     public let hasHighResolutionImage: Bool
-    public let illustrationIdentifier: UUID
-    public let imageUrls: ImageUrls
-    // TODO: Add prices
+    ///A unique identifier for the card artwork that remains consistent across reprints.
+    ///
+    ///Newly spoiled cards may not have this field yet.
+    public let illustrationIdentifier: UUID?
+    public let imageUrls: ImageUrls?
+    ///Containing daily price information for this card
+    public let prices: Prices
+    ///The localized name printed on this card.
     public let printedName: String?
+    ///The localized text printed on this card.
     public let printedText: String?
+    ///The localized type line printed on this card
     public let printedTypeLine: String?
     public let isPromo: Bool
+    ///A `[String]?` describing what categories of promo cards this card falls into.
     public let promoTypes: [String]?
-    // TODO: Add purchase_uris
+    public let purchaseUrls: PurchaseUrls
     public let rarity: Rarity
-    // TODO: Add related_uris
+    ///URLs to this card’s listing on other Magic: The Gathering online resources.
+    public let relatedUrls: RelatedUrls
     // TODO: Add released_at
     public let isReprint: Bool
+    ///A link to this card’s set on Scryfall’s website.
     public let scryfallSetUrl: URL
+    ///This card’s full set name.
     public let setName: String
+    ///A link to where you can begin paginating this card’s set on the Scryfall API.
     public let setSearchUrl: URL
     public let setType: String
+    ///A link to this card’s [set object](https://scryfall.com/docs/api/sets) on Scryfall’s API.
     public let setUrl: URL
     public let setCode: String
     public let isStorySpotlight: Bool
     public let isTextless: Bool
+    ///Whether this card is a variation of another printing.
     public let isVariation: Bool
+    ///The printing ID of the printing this card is a variation of.
     public let isVariationOfCardWithIdentifier: UUID?
-    public let hasWatermark: Bool?
+    public let watermark: String?
 
     // MARK: - Decodeable
     enum CodingKeys: String, CodingKey {
@@ -384,12 +441,15 @@ public struct Card: ScryfallModel {
         case hasHighResolutionImage = "highres_image"
         case illustrationIdentifier = "illustration_id"
         case imageUrls = "image_uris"
+        case prices
         case printedName = "printed_name"
         case printedText = "printed_text"
         case printedTypeLine = "printed_type_line"
         case isPromo = "promo"
         case promoTypes = "promo_types"
+        case purchaseUrls = "purchase_uris"
         case rarity
+        case relatedUrls = "related_uris"
         case isReprint = "reprint"
         case scryfallSetUrl = "scryfall_set_uri"
         case setName = "set_name"
@@ -401,7 +461,7 @@ public struct Card: ScryfallModel {
         case isTextless = "textless"
         case isVariation = "variation"
         case isVariationOfCardWithIdentifier = "variation_of"
-        case hasWatermark = "watermark"
+        case watermark
     }
 // swiftlint:disable:next file_length
 }
