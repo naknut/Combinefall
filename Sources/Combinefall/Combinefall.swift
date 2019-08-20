@@ -277,6 +277,14 @@ R.Failure == URLSession.DataTaskPublisher.Failure {
     )
 }
 
+/// Creates a publisher connected to upstream that queries the `card/named` endpoint of Scryfall.
+///
+/// Names are case-insensitive and punctuation is optional (you can drop apostrophes and periods etc).
+/// For example: `"fIReBALL"` is the same as `"Fireball"` and `"smugglers copter"` is the same as `"Smuggler's Copter"`.
+///
+/// - Parameter upstream: _Required_ A publisher which `Output` must be `(String, ImageVersion)`
+/// The `String` should be set to the exact name of the card and `ImageVersion` desides what image will be returned.
+/// - Returns: A publisher that publishes `Data` mathing the given `upstream` published element.
 public func cardImageDataPublisher<U: Publisher>(upstream: U) -> AnyPublisher<Data, Error>
 where U.Output == (String, ImageVersion), U.Failure == Never {
     _cardImageDataPublisher(upstream: upstream, remotePublisherClosure: URLSession.shared.dataTaskPublisher)
@@ -284,6 +292,15 @@ where U.Output == (String, ImageVersion), U.Failure == Never {
 }
 
 public extension Publisher where Self.Output == (String, ImageVersion), Self.Failure == Never {
+    /// Creates a publisher connected to upstream that queries the `card/named` endpoint of Scryfall.
+    ///
+    /// Names are case-insensitive and punctuation is optional (you can drop apostrophes and periods etc).
+    /// For example: `"fIReBALL"` is the same as `"Fireball"`
+    /// and `"smugglers copter"` is the same as `"Smuggler's Copter"`.
+    ///
+    /// - Parameter upstream: _Required_ A publisher which `Output` must be `(String, ImageVersion)`
+    /// The `String` should be set to the exact name of the card and `ImageVersion` desides what image will be returned.
+    /// - Returns: A publisher that publishes `Data` mathing the given `upstream` published element.
     func cardImageData() -> AnyPublisher<Data, Error> {
         cardImageDataPublisher(upstream: self)
     }
