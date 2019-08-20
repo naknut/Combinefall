@@ -7,17 +7,23 @@ final class CardImageDataPublisherTests: XCTestCase {
     var cancellable: AnyCancellable?
 
     func testSuccessfullFetch() {
-        let expectation = XCTestExpectation(description: "Let publisher publish")
+        let valueExpectation = XCTestExpectation(description: "Let publisher publish")
+        let completionExpectation = XCTestExpectation(description: "Let publisher finish")
         cancellable = _cardImageDataPublisher(
                 upstream: $testUpstream,
                 remotePublisherClosure: { (_: URL) in URLSessionMockPublisher(testData: TestData.catalog) }
             )
             .assertNoFailure()
-            .sink {
-                XCTAssert($0 == TestData.catalog.data)
-                expectation.fulfill()
-            }
-        wait(for: [expectation], timeout: 10.0)
+            .sink(
+                receiveCompletion: {
+                    XCTAssert($0 == .finished)
+                    completionExpectation.fulfill()
+                },
+                receiveValue: {
+                    XCTAssert($0 == TestData.catalog.data)
+                    valueExpectation.fulfill()
+                })
+        wait(for: [valueExpectation, completionExpectation], timeout: 10.0)
     }
 
     static var allTests = [

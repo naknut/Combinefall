@@ -249,14 +249,7 @@ public enum ImageVersion: String {
 // swiftlint:disable:next identifier_name
 func _cardImageDataPublisher<U: Publisher, R: Publisher>(
     upstream: U, remotePublisherClosure: @escaping (URL) -> R
-) ->
-Publishers.MapError<
-    Publishers.Map<
-        Publishers.FlatMap<R, Publishers.SetFailureType<Publishers.Map<U, URL>, URLSession.DataTaskPublisher.Failure>>,
-        Data
-    >,
-    Error
->
+) -> AnyPublisher<Data, Error>
 where
 U.Output == (String, ImageVersion),
 U.Failure == Never,
@@ -264,6 +257,7 @@ R.Output == URLSession.DataTaskPublisher.Output,
 R.Failure == URLSession.DataTaskPublisher.Failure {
     dataPublisher(
         upstream: upstream
+            .first()
             .map { (imageName, version) -> URL in
                 var autoCompleteComponents = EndpointComponents.cardNamed.urlComponents
                 autoCompleteComponents.queryItems = [
@@ -275,6 +269,7 @@ R.Failure == URLSession.DataTaskPublisher.Failure {
             },
         remotePublisherClosure: remotePublisherClosure
     )
+    .eraseToAnyPublisher()
 }
 
 /// Creates a publisher connected to upstream that queries the `card/named` endpoint of Scryfall.
