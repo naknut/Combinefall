@@ -1,5 +1,8 @@
 import Combine
 import Foundation
+#if canImport(UIKit)
+import UIKit
+#endif
 
 private let baseURLComponent: URLComponents = URLComponents(string: "https://api.scryfall.com/")!
 
@@ -20,9 +23,13 @@ public enum Error: Swift.Error {
     case network(underlying: URLError), decode(underlying: Swift.Error), scryfall(underlying: URLError)
 }
 
-func fetchPublisher<U: Publisher, R: Publisher, S: ScryfallModel> (
+func dataPublisher<U: Publisher, R: Publisher> (
     upstream: U, remotePublisherClosure: @escaping (URL) -> R
-) -> AnyPublisher<S, Error>
+) ->
+Publishers.MapError<
+    Publishers.Map<Publishers.FlatMap<R, Publishers.SetFailureType<U, URLSession.DataTaskPublisher.Failure>>, Data>,
+    Error
+>
 where
 U.Output == URL,
 U.Failure == Never,
@@ -32,12 +39,24 @@ R.Failure == URLSession.DataTaskPublisher.Failure {
         .setFailureType(to: URLSession.DataTaskPublisher.Failure.self)
         .flatMap { url -> R in remotePublisherClosure(url) }
         .map { $0.data }
+        .mapError { error -> Error in
+            if 400...500 ~= error.errorCode { return .scryfall(underlying: error) }
+            return .network(underlying: error)
+        }
+}
+
+func fetchPublisher<U: Publisher, R: Publisher, S: ScryfallModel> (
+    upstream: U, remotePublisherClosure: @escaping (URL) -> R
+) -> AnyPublisher<S, Error>
+where
+U.Output == URL,
+U.Failure == Never,
+R.Output == URLSession.DataTaskPublisher.Output,
+R.Failure == URLSession.DataTaskPublisher.Failure {
+    dataPublisher(upstream: upstream, remotePublisherClosure: remotePublisherClosure)
         .decode(type: S.self, decoder: JSONDecoder())
         .mapError { error -> Combinefall.Error in
-            if let urlError = error as? URLError {
-                if 400...500 ~= urlError.errorCode { return .scryfall(underlying: urlError) }
-                return .network(underlying: urlError)
-            }
+            if let error = error as? Combinefall.Error { return error }
             return .decode(underlying: error)
         }.eraseToAnyPublisher()
 }
@@ -172,7 +191,7 @@ public extension Publisher where Self.Output == String, Self.Failure == Never {
     }
 }
 
-// MARK: - Cards
+// MARK: - Card
 
 // Used internaly to inject remote publisher for testing.
 // swiftlint:disable:next identifier_name
@@ -223,3 +242,79 @@ public extension Publisher where Self.Output == String, Self.Failure == Never {
         cardPublisher(upstream: self)
     }
 }
+
+// MARK: - Card Image
+
+public enum ImageVersion: String {
+    case small, normal, large, png, artCrop = "art_crop", borderCrop = "border_crop"
+}
+
+// swiftlint:disable:next identifier_name
+func _cardImageDataPublisher<U: Publisher, R: Publisher>(
+    upstream: U, remotePublisherClosure: @escaping (URL) -> R
+) ->
+Publishers.MapError<
+    Publishers.Map<
+        Publishers.FlatMap<R, Publishers.SetFailureType<Publishers.Map<U, URL>, URLSession.DataTaskPublisher.Failure>>,
+        Data
+    >,
+    Error
+>
+where
+U.Output == (String, ImageVersion),
+U.Failure == Never,
+R.Output == URLSession.DataTaskPublisher.Output,
+R.Failure == URLSession.DataTaskPublisher.Failure {
+    dataPublisher(
+        upstream: upstream
+            .map { (imageName, version) -> URL in
+                var autoCompleteComponents = EndpointComponents.autocomplete.urlComponents
+                autoCompleteComponents.queryItems = [
+                    URLQueryItem(name: "exact", value: imageName),
+                    URLQueryItem(name: "format", value: "image"),
+                    URLQueryItem(name: "version", value: version.rawValue)
+                ]
+                return autoCompleteComponents.url!
+            },
+        remotePublisherClosure: remotePublisherClosure
+    )
+}
+
+public func cardImageDataPublisher<U: Publisher>(upstream: U) -> AnyPublisher<Data, Error>
+where U.Output == (String, ImageVersion), U.Failure == Never {
+    _cardImageDataPublisher(upstream: upstream, remotePublisherClosure: URLSession.shared.dataTaskPublisher)
+        .eraseToAnyPublisher()
+}
+
+public extension Publisher where Self.Output == (String, ImageVersion), Self.Failure == Never {
+    func cardImageData() -> AnyPublisher<Data, Error> {
+        cardImageDataPublisher(upstream: self)
+    }
+}
+
+#if canImport(UIKit)
+// swiftlint:disable:next identifier_name
+func _cardImagePublisher<U: Publisher, R: Publisher>(
+    upstream: U, remotePublisherClosure: @escaping (URL) -> R
+) -> AnyPublisher<UIImage, Error>
+where
+U.Output == (String, ImageVersion),
+U.Failure == Never,
+R.Output == URLSession.DataTaskPublisher.Output,
+R.Failure == URLSession.DataTaskPublisher.Failure {
+    _cardImageDataPublisher(upstream: upstream, remotePublisherClosure: remotePublisherClosure)
+        .compactMap { data in UIImage(data: data) }
+        .eraseToAnyPublisher()
+}
+
+public func cardImagePublisher<U: Publisher>(upstream: U) -> AnyPublisher<UIImage, Error>
+where U.Output == (String, ImageVersion), U.Failure == Never {
+    _cardImagePublisher(upstream: upstream, remotePublisherClosure: URLSession.shared.dataTaskPublisher)
+}
+
+public extension Publisher where Self.Output == (String, ImageVersion), Self.Failure == Never {
+    func cardImage() -> AnyPublisher<UIImage, Error> {
+        cardImagePublisher(upstream: self)
+    }
+}
+#endif
