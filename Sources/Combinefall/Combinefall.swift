@@ -1,8 +1,5 @@
 import Combine
 import Foundation
-#if canImport(UIKit)
-import UIKit
-#endif
 
 private let baseURLComponent: URLComponents = URLComponents(string: "https://api.scryfall.com/")!
 
@@ -291,30 +288,3 @@ public extension Publisher where Self.Output == (String, ImageVersion), Self.Fai
         cardImageDataPublisher(upstream: self)
     }
 }
-
-#if canImport(UIKit)
-// swiftlint:disable:next identifier_name
-func _cardImagePublisher<U: Publisher, R: Publisher>(
-    upstream: U, remotePublisherClosure: @escaping (URL) -> R
-) -> AnyPublisher<UIImage, Error>
-where
-U.Output == (String, ImageVersion),
-U.Failure == Never,
-R.Output == URLSession.DataTaskPublisher.Output,
-R.Failure == URLSession.DataTaskPublisher.Failure {
-    _cardImageDataPublisher(upstream: upstream, remotePublisherClosure: remotePublisherClosure)
-        .compactMap { data in UIImage(data: data) }
-        .eraseToAnyPublisher()
-}
-
-public func cardImagePublisher<U: Publisher>(upstream: U) -> AnyPublisher<UIImage, Error>
-where U.Output == (String, ImageVersion), U.Failure == Never {
-    _cardImagePublisher(upstream: upstream, remotePublisherClosure: URLSession.shared.dataTaskPublisher)
-}
-
-public extension Publisher where Self.Output == (String, ImageVersion), Self.Failure == Never {
-    func cardImage() -> AnyPublisher<UIImage, Error> {
-        cardImagePublisher(upstream: self)
-    }
-}
-#endif
