@@ -268,7 +268,7 @@ R.Failure == URLSession.DataTaskPublisher.Failure {
     dataPublisher(
         upstream: upstream
             .map { (imageName, version) -> URL in
-                var autoCompleteComponents = EndpointComponents.autocomplete.urlComponents
+                var autoCompleteComponents = EndpointComponents.cardNamed.urlComponents
                 autoCompleteComponents.queryItems = [
                     URLQueryItem(name: "exact", value: imageName),
                     URLQueryItem(name: "format", value: "image"),
