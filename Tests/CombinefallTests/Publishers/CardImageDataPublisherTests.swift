@@ -13,11 +13,13 @@ final class CardImageDataPublisherTests: XCTestCase {
                 upstream: $testUpstream,
                 remotePublisherClosure: { (_: URL) in URLSessionMockPublisher(testData: TestData.catalog) }
             )
-            .assertNoFailure()
             .sink(
                 receiveCompletion: {
-                    XCTAssert($0 == .finished)
-                    completionExpectation.fulfill()
+                    defer { completionExpectation.fulfill() }
+                    switch $0 {
+                    case .finished: return
+                    default: XCTFail("Did not finish")
+                    }
                 },
                 receiveValue: {
                     XCTAssert($0 == TestData.catalog.data)

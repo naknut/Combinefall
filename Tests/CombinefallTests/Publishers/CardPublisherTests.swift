@@ -14,7 +14,13 @@ final class CardPublisherTests: XCTestCase {
                 remotePublisherClosure: { (_: URL) in URLSessionMockPublisher(testData: TestData.card) }
             )
             .sink(
-                receiveCompletion: { _ in completionExpectation.fulfill() },
+                receiveCompletion: {
+                    defer { completionExpectation.fulfill() }
+                    switch $0 {
+                    case .finished: return
+                    default: XCTFail("Did not finish")
+                    }
+                },
                 receiveValue: { _ in valueExpectation.fulfill() }
             )
         wait(for: [valueExpectation, completionExpectation], timeout: 10.0)
