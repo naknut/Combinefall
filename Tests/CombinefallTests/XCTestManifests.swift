@@ -18,7 +18,10 @@ public func allTests() -> [XCTestCaseEntry] {
         testCase(PricesTests.allTests),
         testCase(CoreCardPropertiesTests.allTests),
         testCase(GameplayPropertiestTests.allTests),
-        testCase(PrintPropertiestTests.allTests)
+        testCase(PrintPropertiestTests.allTests),
+        testCase(CardImageDataPublisherTests.allTests),
+        testCase(DataPublisherTests.allTests),
+        testCase(ImageVersonTests.allTests)
     ]
 }
 #endif
