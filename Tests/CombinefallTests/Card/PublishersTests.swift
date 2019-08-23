@@ -3,8 +3,9 @@ import Combine
 @testable import Combinefall
 
 final class PublishersTests: XCTestCase {
+    // swiftlint:disable:next force_try
     let testCard = try! JSONDecoder().decode(Card.self, from: TestData.card.data)
-    
+
     var cancellable: AnyCancellable?
     func testAlternativePrintsListPublisher() {
         let expectation = XCTestExpectation(description: "Let publisher publish")
@@ -17,7 +18,7 @@ final class PublishersTests: XCTestCase {
             }
         wait(for: [expectation], timeout: 10.0)
     }
-    
+
     func testAlternativePrintsPublisher() {
         let expectation = XCTestExpectation(description: "Let publisher publish")
         cancellable = testCard._alternativePrintsPublisher(
