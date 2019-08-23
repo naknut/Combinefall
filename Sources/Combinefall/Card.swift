@@ -395,8 +395,17 @@ public struct Card: ScryfallModel {
     /// Creates a publisher that will publish all of the alternativ prints of this card.
     ///
     /// - Returns: A publisher that publishes a `CardCatalog` with all alternative prints of this `Card`.
-    public func alternativePrintsPublisher() -> AnyPublisher<CardCatalog, Error> {
+    public func alternativePrintsCatalogPublisher() -> AnyPublisher<CardCatalog, Error> {
         fetchPublisher(upstream: Just(printsSearchUrl), remotePublisherClosure: URLSession.shared.dataTaskPublisher)
+    }
+
+    /// Creates a publisher that will publish all of the alternativ prints of this card.
+    ///
+    /// - Returns: A publisher that publishes a `[Card]` with all alternative prints of this `Card`.
+    public func alternativePrintsPublisher() -> AnyPublisher<[Card], Error> {
+        alternativePrintsCatalogPublisher()
+            .map { $0.data }
+            .eraseToAnyPublisher()
     }
 
     // MARK: - Decodeable
