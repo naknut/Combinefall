@@ -27,8 +27,4 @@ final class CardImageDataPublisherTests: XCTestCase {
                 })
         wait(for: [valueExpectation, completionExpectation], timeout: 10.0)
     }
-
-    static var allTests = [
-        ("testSuccessfullFetch", testSuccessfullFetch)
-    ]
 }

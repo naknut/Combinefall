@@ -29,11 +29,4 @@ final class FrameTests: XCTestCase {
             "Frame is not of the right case"
         )
     }
-
-    static var allTests = [
-        ("testNineteenNinetyThreeRawValue", testNineteenNinetyThreeRawValue),
-        ("testNineteenNinetySevenRawValue", testNineteenNinetySevenRawValue),
-        ("testTwentyOThreeRawValue", testTwentyOThreeRawValue),
-        ("testTwentyFifteenRawValue", testTwentyFifteenRawValue)
-    ]
 }

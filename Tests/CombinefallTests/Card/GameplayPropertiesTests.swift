@@ -80,18 +80,4 @@ final class GameplayPropertiestTests: XCTestCase {
             "CodingKey is not of the right case"
         )
     }
-
-    static var allTests = [
-        ("testCardFacesCodingKey", testCardFacesCodingKey),
-        ("testConvertedManaCostCodingKey", testConvertedManaCostCodingKey),
-        ("testColorIdentityCodingKey", testColorIdentityCodingKey),
-        ("testColorIndicatorCodingKey", testColorIndicatorCodingKey),
-        ("testEdhrecRankCodingKey", testEdhrecRankCodingKey),
-        ("testCanBeFoilCodingKey", testCanBeFoilCodingKey),
-        ("testHandModifierCodingKey", testHandModifierCodingKey),
-        ("testManaCostCodingKey", testManaCostCodingKey),
-        ("testCanBeNonFoilCodingKey", testCanBeNonFoilCodingKey),
-        ("testOracleTextCodingKey", testOracleTextCodingKey),
-        ("testTypeLineCodingKey", testTypeLineCodingKey)
-    ]
 }

@@ -29,11 +29,4 @@ final class PricesTests: XCTestCase {
             "Legality is not of the right case"
         )
     }
-
-    static var allTests = [
-        ("unitedStatesDollarCodingKey", unitedStatesDollarCodingKey),
-        ("unitedStatesDollarFoilCodingKey", unitedStatesDollarFoilCodingKey),
-        ("euroCodingKey", euroCodingKey),
-        ("magicOnlineEventTicketCodingKey", magicOnlineEventTicketCodingKey)
-    ]
 }

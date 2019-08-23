@@ -45,12 +45,4 @@ final class ListTests: XCTestCase {
         XCTAssertNotNil(cancellable)
         wait(for: [expectation], timeout: 10.0)
     }
-
-    static var allTests = [
-        ("testTotalCardsCodingKey", testTotalCardsCodingKey),
-        ("testHasMoreCodingKey", testHasMoreCodingKey),
-        ("testNextPageCodingKey", testNextPageCodingKey),
-        ("testNextPagePublisherWithNoNextPage", testNextPagePublisherWithNoNextPage),
-        ("testNextPagePublisher", testNextPagePublisher)
-    ]
 }

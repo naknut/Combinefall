@@ -68,9 +68,4 @@ final class DataPublisherTests: XCTestCase {
             }
         wait(for: [expectation], timeout: 10.0)
     }
-
-    static var allTests = [
-        ("testNetworkError", testNetworkError),
-        ("testSuccessfullFetch", testSuccessfullFetch)
-    ]
 }

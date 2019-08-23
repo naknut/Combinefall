@@ -8,8 +8,4 @@ final class GameTests: XCTestCase {
             "Frame is not of the right case"
         )
     }
-
-    static var allTests = [
-        ("testMagicOnlineRawValue", testMagicOnlineRawValue)
-    ]
 }

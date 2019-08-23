@@ -16,9 +16,4 @@ final class ImageVersonTests: XCTestCase {
             "Frame is not of the right case"
         )
     }
-
-    static var allTests = [
-        ("testArtCropRawValue", testArtCropRawValue),
-        ("testBorderCropRawValue", testBorderCropRawValue)
-    ]
 }

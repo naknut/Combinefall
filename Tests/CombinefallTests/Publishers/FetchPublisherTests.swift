@@ -22,8 +22,4 @@ final class FetchPublisherTests: XCTestCase {
             )
         wait(for: [expectation], timeout: 10.0)
     }
-
-    static var allTests = [
-        ("testDecodeError", testDecodeError)
-    ]
 }

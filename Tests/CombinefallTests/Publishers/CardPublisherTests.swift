@@ -25,8 +25,4 @@ final class CardPublisherTests: XCTestCase {
             )
         wait(for: [valueExpectation, completionExpectation], timeout: 10.0)
     }
-
-    static var allTests = [
-        ("testCard", testCard)
-    ]
 }

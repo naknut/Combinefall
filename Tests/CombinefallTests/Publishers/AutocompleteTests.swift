@@ -38,9 +38,4 @@ final class AutocompleteTests: XCTestCase {
             }
         wait(for: [expectation], timeout: 10.0)
     }
-
-    static var allTests = [
-        ("testAutocompleteCatalog", testAutocompleteCatalog),
-        ("testAutocomplete", testAutocomplete)
-    ]
 }

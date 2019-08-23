@@ -29,11 +29,4 @@ final class FrameEffectTests: XCTestCase {
             "Language is not of the right case"
         )
     }
-
-    static var allTests = [
-        ("testSunAndMoonDoubleFaceCardRawValue", testSunAndMoonDoubleFaceCardRawValue),
-        ("testCompassLandDoubleFaceCardRawValue", testCompassLandDoubleFaceCardRawValue),
-        ("testOriginsPlaneswalkerDoubleFaceCardRawValue", testOriginsPlaneswalkerDoubleFaceCardRawValue),
-        ("testMoonEldraziDoubleFaceCardRawValue", testMoonEldraziDoubleFaceCardRawValue)
-    ]
 }

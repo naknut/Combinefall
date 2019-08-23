@@ -71,17 +71,4 @@ final class CardFaceTests: XCTestCase {
             "CodingKey is not of the right case"
         )
     }
-
-    static var allTests = [
-        ("testColorIndicatorCodingKey", testColorIndicatorCodingKey),
-        ("testFlavorTextCodingKey", testFlavorTextCodingKey),
-        ("testIllustrationIdentifierCodingKey", testIllustrationIdentifierCodingKey),
-        ("testImageUrlsCodingKey", testImageUrlsCodingKey),
-        ("testManaCostCodingKey", testManaCostCodingKey),
-        ("testOracleTextCodingKey", testOracleTextCodingKey),
-        ("testPrintedNameCodingKey", testPrintedNameCodingKey),
-        ("testPrintedTextCodingKey", testPrintedTextCodingKey),
-        ("testPrintedTypeLineCodingKey", testPrintedTypeLineCodingKey),
-        ("testTypeLineLineCodingKey", testTypeLineLineCodingKey)
-    ]
 }

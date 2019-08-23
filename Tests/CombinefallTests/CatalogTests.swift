@@ -8,8 +8,4 @@ final class CatalogTests: XCTestCase {
             "CodingKey is not of the right case"
         )
     }
-
-    static var allTests = [
-        ("testTotalValuesCodingKey", testTotalValuesCodingKey)
-    ]
 }

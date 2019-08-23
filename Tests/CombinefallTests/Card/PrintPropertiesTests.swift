@@ -206,36 +206,4 @@ final class PrintPropertiestTests: XCTestCase {
             "CodingKey is not of the right case"
         )
     }
-
-    static let allTests = [
-        ("testCanBeFoundInBoosterCodingKey", testCanBeFoundInBoosterCodingKey),
-        ("testBorderColorCodingKey", testBorderColorCodingKey),
-        ("testCardBackIdentifierCodingKey", testCardBackIdentifierCodingKey),
-        ("testCollectorNumberCodingKey", testCollectorNumberCodingKey),
-        ("testIsDigitalCodingKey", testIsDigitalCodingKey),
-        ("testFlavorTextCodingKey", testFlavorTextCodingKey),
-        ("testFrameEffectCodingKey", testFrameEffectCodingKey),
-        ("testFullArtCodingKey", testFullArtCodingKey),
-        ("testAvailableInCodingKey", testAvailableInCodingKey),
-        ("testHasHighResolutionImageCodingKey", testHasHighResolutionImageCodingKey),
-        ("testIllustrationIdentifierCodingKey", testIllustrationIdentifierCodingKey),
-        ("testImageUrlsCodingKey", testImageUrlsCodingKey),
-        ("testPrintedTextCodingKey", testPrintedTextCodingKey),
-        ("testPrintedTypeLineCodingKey", testPrintedTypeLineCodingKey),
-        ("testIsPromoCodingKey", testIsPromoCodingKey),
-        ("testPromoTypesCodingKey", testPromoTypesCodingKey),
-        ("testPurchaseUrlsCodingKey", testPurchaseUrlsCodingKey),
-        ("testRelatedUrlsCodingKey", testRelatedUrlsCodingKey),
-        ("testIsReprintCodingKey", testIsReprintCodingKey),
-        ("testScryfallSetUrlCodingKey", testScryfallSetUrlCodingKey),
-        ("testSetNameCodingKey", testSetNameCodingKey),
-        ("testSetSearchUrlCodingKey", testSetSearchUrlCodingKey),
-        ("testSetTypeCodingKey", testSetTypeCodingKey),
-        ("testSetUrlCodingKey", testSetUrlCodingKey),
-        ("testSetCodeCodingKey", testSetCodeCodingKey),
-        ("testIsStorySpotlightCodingKey", testIsStorySpotlightCodingKey),
-        ("testIsTextlessCodingKey", testIsTextlessCodingKey),
-        ("testIsVariationCodingKey", testIsVariationCodingKey),
-        ("testIsVariationOfCardWithIdentifierCodingKey", testIsVariationOfCardWithIdentifierCodingKey)
-    ]
 }

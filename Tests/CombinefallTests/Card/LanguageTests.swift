@@ -120,24 +120,4 @@ final class LanguageTests: XCTestCase {
             "Language is not of the right case"
         )
     }
-
-    static var allTests = [
-        ("testEnglishRawValue", testEnglishRawValue),
-        ("testSpanishRawValue", testSpanishRawValue),
-        ("testFrenchRawValue", testFrenchRawValue),
-        ("testGermanRawValue", testGermanRawValue),
-        ("testItalianRawValue", testItalianRawValue),
-        ("testPortugueseRawValue", testPortugueseRawValue),
-        ("testJapaneseRawValue", testJapaneseRawValue),
-        ("testKoreanRawValue", testKoreanRawValue),
-        ("testRussianRawValue", testRussianRawValue),
-        ("testSimplifiedChineseRawValue", testSimplifiedChineseRawValue),
-        ("testTraditionalChineseRawValue", testTraditionalChineseRawValue),
-        ("testHebrewRawValue", testHebrewRawValue),
-        ("testLatinRawValue", testLatinRawValue),
-        ("testAncientGreekRawValue", testAncientGreekRawValue),
-        ("testArabicRawValue", testArabicRawValue),
-        ("testSanskritRawValue", testSanskritRawValue),
-        ("testPhyrexianRawValue", testPhyrexianRawValue)
-    ]
 }

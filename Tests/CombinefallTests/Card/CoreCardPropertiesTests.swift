@@ -85,19 +85,4 @@ final class CoreCardPropertiesTests: XCTestCase {
             "CodingKey is not of the right case"
         )
     }
-
-    static var allTests = [
-        ("testArenaIdentifierCodingKey", testArenaIdentifierCodingKey),
-        ("testIdentifierCodingKey", testIdentifierCodingKey),
-        ("testLanguageCodingKey", testLanguageCodingKey),
-        ("testMagicOnlineIdentifierCodingKey", testMagicOnlineIdentifierCodingKey),
-        ("testMagicOnlineFoilIdentifierCodingKey", testMagicOnlineFoilIdentifierCodingKey),
-        ("testMultiverseIdentifierCodingKey", testMultiverseIdentifierCodingKey),
-        ("testTcgPlayerIdentifierCodingKey", testTcgPlayerIdentifierCodingKey),
-        ("testOracleIdentifierCodingKey", testOracleIdentifierCodingKey),
-        ("testPrintsSearchUrlCodingKey", testPrintsSearchUrlCodingKey),
-        ("testRulingsUrlCodingKey", testRulingsUrlCodingKey),
-        ("testScryfallUrlCodingKey", testScryfallUrlCodingKey),
-        ("testUrlCodingKey", testUrlCodingKey)
-    ]
 }

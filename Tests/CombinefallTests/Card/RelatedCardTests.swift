@@ -25,13 +25,4 @@ final class RelatedCardTests: XCTestCase {
     func testUrlCodingKey() {
         XCTAssert(Card.RelatedCard.CodingKeys(rawValue: "uri") == .url, "CodingKey is of the wrong case")
     }
-
-    static var allTests = [
-        ("testComponentMeldPartRawValue", testComponentMeldPartRawValue),
-        ("testComponentMeldResultRawValue", testComponentMeldResultRawValue),
-        ("testComponentcomboPieceRawValue", testComponentcomboPieceRawValue),
-        ("testIdentifierCodingKey", testIdentifierCodingKey),
-        ("testTypeLineCodingKey", testTypeLineCodingKey),
-        ("testUrlCodingKey", testUrlCodingKey)
-    ]
 }
