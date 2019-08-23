@@ -1,4 +1,5 @@
 import Foundation
+import Combine
 
 ///Represent individual _Magic: The Gathering_ cards that players
 ///could obtain and add to their collection (with a few minor exceptions).
@@ -390,6 +391,13 @@ public struct Card: ScryfallModel {
     ///The printing ID of the printing this card is a variation of.
     public let isVariationOfCardWithIdentifier: UUID?
     public let watermark: String?
+
+    /// Creates a publisher that will publish all of the alternativ prints of this card.
+    ///
+    /// - Returns: A publisher that publishes a `CardCatalog` with all alternative prints of this `Card`.
+    public func alternativePrintsPublisher() -> AnyPublisher<CardCatalog, Error> {
+        fetchPublisher(upstream: Just(printsSearchUrl), remotePublisherClosure: URLSession.shared.dataTaskPublisher)
+    }
 
     // MARK: - Decodeable
     enum CodingKeys: String, CodingKey {
