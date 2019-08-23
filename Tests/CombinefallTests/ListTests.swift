@@ -27,7 +27,7 @@ final class ListTests: XCTestCase {
     func testNextPagePublisherWithNoNextPage() {
         // swiftlint:disable:next force_try
         let testList = try! JSONDecoder().decode(List<Card>.self, from: TestData.cardList.data)
-        XCTAssertNil(testList.nextPagePublisher())
+        XCTAssertNil(testList.nextPagePublisher(on: RunLoop.current))
     }
 
     var cancellable: AnyCancellable?
@@ -36,7 +36,8 @@ final class ListTests: XCTestCase {
         let testList = try! JSONDecoder().decode(List<Card>.self, from: TestData.cardListWithMore.data)
         let expectation = XCTestExpectation(description: "Let publisher publish")
         cancellable = testList._nextPagePublisher(
-                remotePublisherClosure: { (_: URL) in URLSessionMockPublisher(testData: TestData.cardList) }
+                remotePublisherClosure: { (_: URL) in URLSessionMockPublisher(testData: TestData.cardList) },
+                scheduler: RunLoop.current
             )?
             .assertNoFailure()
             .sink { _ in

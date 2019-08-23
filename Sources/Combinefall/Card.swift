@@ -394,27 +394,27 @@ public struct Card: ScryfallModel {
 
     // Used internaly to inject remote publisher for testing.
     // swiftlint:disable:next identifier_name
-    func _alternativePrintsListPublisher<R: Publisher>(
-        remotePublisherClosure: @escaping (URL) -> R
+    func _alternativePrintsListPublisher<R: Publisher, S: Scheduler>(
+        remotePublisherClosure: @escaping (URL) -> R, scheduler: S
     ) -> AnyPublisher<CardList, Error>
     where R.Output == URLSession.DataTaskPublisher.Output, R.Failure == URLSession.DataTaskPublisher.Failure {
-        fetchPublisher(upstream: Just(printsSearchUrl), remotePublisherClosure: remotePublisherClosure)
+        fetchPublisher(upstream: Just(printsSearchUrl).receive(on: scheduler), remotePublisherClosure: remotePublisherClosure)
     }
 
     /// Creates a publisher that will publish all of the alternativ prints of this card.
     ///
     /// - Returns: A publisher that publishes a `CardCatalog` with all alternative prints of this `Card`.
-    public func alternativePrintsListPublisher() -> AnyPublisher<CardList, Error> {
-        _alternativePrintsListPublisher(remotePublisherClosure: URLSession.shared.dataTaskPublisher)
+    public func alternativePrintsListPublisher<S: Scheduler>(on scheduler: S) -> AnyPublisher<CardList, Error> {
+        _alternativePrintsListPublisher(remotePublisherClosure: URLSession.shared.dataTaskPublisher, scheduler: scheduler)
     }
 
     // Used internaly to inject remote publisher for testing.
     // swiftlint:disable:next identifier_name
-    public func _alternativePrintsPublisher<R: Publisher>(
-        remotePublisherClosure: @escaping (URL) -> R
+    public func _alternativePrintsPublisher<R: Publisher, S: Scheduler>(
+        remotePublisherClosure: @escaping (URL) -> R, scheduler: S
     ) -> AnyPublisher<[Card], Error>
     where R.Output == URLSession.DataTaskPublisher.Output, R.Failure == URLSession.DataTaskPublisher.Failure {
-        _alternativePrintsListPublisher(remotePublisherClosure: remotePublisherClosure)
+        _alternativePrintsListPublisher(remotePublisherClosure: remotePublisherClosure, scheduler: scheduler)
             .map { $0.data }
             .eraseToAnyPublisher()
     }
@@ -422,8 +422,8 @@ public struct Card: ScryfallModel {
     /// Creates a publisher that will publish all of the alternativ prints of this card.
     ///
     /// - Returns: A publisher that publishes a `[Card]` with all alternative prints of this `Card`.
-    public func alternativePrintsPublisher() -> AnyPublisher<[Card], Error> {
-        _alternativePrintsPublisher(remotePublisherClosure: URLSession.shared.dataTaskPublisher)
+    public func alternativePrintsPublisher<S: Scheduler>(on scheduler: S) -> AnyPublisher<[Card], Error> {
+        _alternativePrintsPublisher(remotePublisherClosure: URLSession.shared.dataTaskPublisher, scheduler: scheduler)
     }
 
     // MARK: - Decodeable
