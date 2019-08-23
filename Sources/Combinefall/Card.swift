@@ -392,20 +392,38 @@ public struct Card: ScryfallModel {
     public let isVariationOfCardWithIdentifier: UUID?
     public let watermark: String?
 
-    /// Creates a publisher that will publish all of the alternativ prints of this card.
-    ///
-    /// - Returns: A publisher that publishes a `CardCatalog` with all alternative prints of this `Card`.
-    public func alternativePrintsCatalogPublisher() -> AnyPublisher<CardCatalog, Error> {
-        fetchPublisher(upstream: Just(printsSearchUrl), remotePublisherClosure: URLSession.shared.dataTaskPublisher)
+    // Used internaly to inject remote publisher for testing.
+    // swiftlint:disable:next identifier_name
+    func _alternativePrintsListPublisher<R: Publisher>(
+        remotePublisherClosure: @escaping (URL) -> R
+    ) -> AnyPublisher<CardList, Error>
+    where R.Output == URLSession.DataTaskPublisher.Output, R.Failure == URLSession.DataTaskPublisher.Failure {
+        fetchPublisher(upstream: Just(printsSearchUrl), remotePublisherClosure: remotePublisherClosure)
     }
 
     /// Creates a publisher that will publish all of the alternativ prints of this card.
     ///
-    /// - Returns: A publisher that publishes a `[Card]` with all alternative prints of this `Card`.
-    public func alternativePrintsPublisher() -> AnyPublisher<[Card], Error> {
-        alternativePrintsCatalogPublisher()
+    /// - Returns: A publisher that publishes a `CardCatalog` with all alternative prints of this `Card`.
+    public func alternativePrintsListPublisher() -> AnyPublisher<CardList, Error> {
+        _alternativePrintsListPublisher(remotePublisherClosure: URLSession.shared.dataTaskPublisher)
+    }
+
+    // Used internaly to inject remote publisher for testing.
+    // swiftlint:disable:next identifier_name
+    public func _alternativePrintsPublisher<R: Publisher>(
+        remotePublisherClosure: @escaping (URL) -> R
+    ) -> AnyPublisher<[Card], Error>
+    where R.Output == URLSession.DataTaskPublisher.Output, R.Failure == URLSession.DataTaskPublisher.Failure {
+        _alternativePrintsListPublisher(remotePublisherClosure: remotePublisherClosure)
             .map { $0.data }
             .eraseToAnyPublisher()
+    }
+    
+    /// Creates a publisher that will publish all of the alternativ prints of this card.
+    ///
+    /// - Returns: A publisher that publishes a `[Card]` with all alternative prints of this `Card`.
+    public func alternativePrintsPublisher() -> AnyPublisher<[Card], Error> {
+        _alternativePrintsPublisher(remotePublisherClosure: URLSession.shared.dataTaskPublisher)
     }
 
     // MARK: - Decodeable
