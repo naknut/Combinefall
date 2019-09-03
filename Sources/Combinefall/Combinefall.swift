@@ -22,11 +22,7 @@ public enum Error: Swift.Error {
 
 func dataPublisher<U: Publisher, R: Publisher> (
     upstream: U, remotePublisherClosure: @escaping (URL) -> R
-) ->
-Publishers.MapError<
-    Publishers.Map<Publishers.FlatMap<R, Publishers.SetFailureType<U, URLSession.DataTaskPublisher.Failure>>, Data>,
-    Error
->
+) -> AnyPublisher<Data, Error>
 where
 U.Output == URL,
 U.Failure == Never,
@@ -40,6 +36,7 @@ R.Failure == URLSession.DataTaskPublisher.Failure {
             if 400...500 ~= error.errorCode { return .scryfall(underlying: error) }
             return .network(underlying: error)
         }
+        .eraseToAnyPublisher()
 }
 
 func fetchPublisher<U: Publisher, R: Publisher, S: ScryfallModel> (
@@ -55,7 +52,8 @@ R.Failure == URLSession.DataTaskPublisher.Failure {
         .mapError { error -> Combinefall.Error in
             if let error = error as? Combinefall.Error { return error }
             return .decode(underlying: error)
-        }.eraseToAnyPublisher()
+        }
+        .eraseToAnyPublisher()
 }
 
 // MARK: - Autocomplete
