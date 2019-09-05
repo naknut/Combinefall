@@ -244,24 +244,29 @@ public enum ImageVersion: String {
     case small, normal, large, png, artCrop = "art_crop", borderCrop = "border_crop"
 }
 
+public struct CardImageParameters {
+    public let name: String
+    public let version: ImageVersion
+}
+
 // swiftlint:disable:next identifier_name
 func _cardImageDataPublisher<U: Publisher, R: Publisher>(
     upstream: U, remotePublisherClosure: @escaping (URL) -> R
 ) -> AnyPublisher<Data, Error>
 where
-U.Output == (String, ImageVersion),
+U.Output == CardImageParameters,
 U.Failure == Never,
 R.Output == URLSession.DataTaskPublisher.Output,
 R.Failure == URLSession.DataTaskPublisher.Failure {
     dataPublisher(
         upstream: upstream
             .first()
-            .map { (imageName, version) -> URL in
+            .map { cardImageParameters -> URL in
                 var autoCompleteComponents = EndpointComponents.cardNamed.urlComponents
                 autoCompleteComponents.queryItems = [
-                    URLQueryItem(name: "exact", value: imageName),
+                    URLQueryItem(name: "exact", value: cardImageParameters.name),
                     URLQueryItem(name: "format", value: "image"),
-                    URLQueryItem(name: "version", value: version.rawValue)
+                    URLQueryItem(name: "version", value: cardImageParameters.version.rawValue)
                 ]
                 return autoCompleteComponents.url!
             },
@@ -279,12 +284,12 @@ R.Failure == URLSession.DataTaskPublisher.Failure {
 /// The `String` should be set to the exact name of the card and `ImageVersion` desides what image will be returned.
 /// - Returns: A publisher that publishes `Data` mathing the given `upstream` published element.
 public func cardImageDataPublisher<U: Publisher>(upstream: U) -> AnyPublisher<Data, Error>
-where U.Output == (String, ImageVersion), U.Failure == Never {
+where U.Output == CardImageParameters, U.Failure == Never {
     _cardImageDataPublisher(upstream: upstream, remotePublisherClosure: URLSession.shared.dataTaskPublisher)
         .eraseToAnyPublisher()
 }
 
-public extension Publisher where Self.Output == (String, ImageVersion), Self.Failure == Never {
+public extension Publisher where Self.Output == CardImageParameters, Self.Failure == Never {
     /// Creates a publisher connected to upstream that queries the `card/named` endpoint of Scryfall.
     ///
     /// Names are case-insensitive and punctuation is optional (you can drop apostrophes and periods etc).

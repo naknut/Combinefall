@@ -3,7 +3,7 @@ import Combine
 @testable import Combinefall
 
 final class CardImageDataPublisherTests: XCTestCase {
-    @Published var testUpstream: (String, ImageVersion) = ("Ajani", .png)
+    @Published var testUpstream = CardImageParameters(name: "Ajani", version: .png)
     var cancellable: AnyCancellable?
 
     func testSuccessfullFetch() {
