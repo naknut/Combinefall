@@ -398,14 +398,18 @@ public struct Card: ScryfallModel {
         remotePublisherClosure: @escaping (URL) -> R, scheduler: S
     ) -> AnyPublisher<CardList, Error>
     where R.Output == URLSession.DataTaskPublisher.Output, R.Failure == URLSession.DataTaskPublisher.Failure {
-        fetchPublisher(upstream: Just(printsSearchUrl).receive(on: scheduler), remotePublisherClosure: remotePublisherClosure)
+        fetchPublisher(
+            upstream: Just(printsSearchUrl).receive(on: scheduler), remotePublisherClosure: remotePublisherClosure
+        )
     }
 
     /// Creates a publisher that will publish all of the alternativ prints of this card.
     ///
     /// - Returns: A publisher that publishes a `CardCatalog` with all alternative prints of this `Card`.
     public func alternativePrintsListPublisher<S: Scheduler>(on scheduler: S) -> AnyPublisher<CardList, Error> {
-        _alternativePrintsListPublisher(remotePublisherClosure: URLSession.shared.dataTaskPublisher, scheduler: scheduler)
+        _alternativePrintsListPublisher(
+            remotePublisherClosure: URLSession.shared.dataTaskPublisher, scheduler: scheduler
+        )
     }
 
     // Used internaly to inject remote publisher for testing.
