@@ -247,6 +247,11 @@ public enum ImageVersion: String {
 public struct CardImageParameters {
     public let name: String
     public let version: ImageVersion
+
+    public init(name: String, version: ImageVersion) {
+        self.name = name
+        self.version = version
+    }
 }
 
 // swiftlint:disable:next identifier_name
