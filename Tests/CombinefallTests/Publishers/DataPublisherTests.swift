@@ -69,7 +69,7 @@ final class DataPublisherTests: XCTestCase {
             }
         wait(for: [expectation], timeout: 10.0)
     }
-    
+
     func testSuccessfullFetchWithEndpointComponents() {
         let expectation = XCTestExpectation(description: "Let publisher publish")
         cancellable = dataPublisher(

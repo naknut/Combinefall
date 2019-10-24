@@ -5,7 +5,7 @@ import Combine
 final class FetchPublisherTests: XCTestCase {
     @Published var testUrlUpstream: URL = URL(string: "https://example.com")!
     @Published var testEndpointComponentsUpstream: EndpointComponents = .autocomplete(searchTerm: "Grizzly Bears")
-    
+
     var cancellable: AnyCancellable?
 
     func testDecodeError() {
@@ -24,7 +24,7 @@ final class FetchPublisherTests: XCTestCase {
             )
         wait(for: [expectation], timeout: 10.0)
     }
-    
+
     func testSuccessfullFetchWithUrl() {
         let expectation = XCTestExpectation(description: "Let publisher publish")
         cancellable = (fetchPublisher(
@@ -37,7 +37,7 @@ final class FetchPublisherTests: XCTestCase {
             )
         wait(for: [expectation], timeout: 10.0)
     }
-    
+
     func testSuccessfullWithFetchEndpointComponents() {
         let expectation = XCTestExpectation(description: "Let publisher publish")
         cancellable = (fetchPublisher(
