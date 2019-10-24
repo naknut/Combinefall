@@ -10,7 +10,7 @@ jobs:
     steps:
     - uses: actions/checkout@v1
     - name: Set Xcode Version to 11.1
-      run: xcode-select --switch /Applications/Xcode_11.1.app/Contents/Developer
+      run: sudo xcode-select --switch /Applications/Xcode_11.1.app/Contents/Developer
     - name: Build
       run: swift build -v
     - name: Run tests
