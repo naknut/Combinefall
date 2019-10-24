@@ -12,7 +12,6 @@ jobs:
     - name: Set Xcode Version to 11.1
       run: sudo xcode-select --switch /Applications/Xcode_11.1.app/Contents/Developer
     - name: Build tests
-      run: swift build --build-tests
-    - debug: 
+      run: swift build -v
     - name: Run tests
       run: swift test -v
