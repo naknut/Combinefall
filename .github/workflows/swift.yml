@@ -5,7 +5,7 @@ on: [push]
 jobs:
   build:
 
-    runs-on: macOS-latest
+    runs-on: macOS-10.15
 
     steps:
     - uses: actions/checkout@v1
@@ -13,5 +13,6 @@ jobs:
       run: sudo xcode-select --switch /Applications/Xcode_11.1.app/Contents/Developer
     - name: Build tests
       run: swift build --build-tests
+    - debug: 
     - name: Run tests
       run: swift test -v
