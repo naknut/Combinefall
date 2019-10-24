@@ -5,13 +5,11 @@ on: [push]
 jobs:
   build:
 
-    runs-on: macosx10.15
+    runs-on: macOS-latest
 
     steps:
     - uses: actions/checkout@v1
     - name: Set Xcode Version to 11.1
-      run: xcode-select --switch /Applications/Xcode_11.1.app/Contents/Developer
-    - name: Build
-      run: swift build -v
+      run: sudo code-select --switch /Applications/Xcode_11.1.app/Contents/Developer
     - name: Run tests
       run: swift test -v
