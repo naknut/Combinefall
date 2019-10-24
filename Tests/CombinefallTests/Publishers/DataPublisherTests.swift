@@ -28,13 +28,14 @@ final class DataPublisherTests: XCTestCase {
         }
     }
 
-    @Published var testUpstream: URL = URL(string: "https://example.com")!
+    @Published var testUrlUpstream: URL = URL(string: "https://example.com")!
+    @Published var testEndpointComponentsUpstream: EndpointComponents = .autocomplete(searchTerm: "Grizzly Bears")
     var cancellable: AnyCancellable?
 
     func testNetworkError() {
         let expectation = XCTestExpectation(description: "Let publisher publish")
         cancellable = dataPublisher(
-                upstream: $testUpstream,
+                upstream: $testUrlUpstream,
                 remotePublisherClosure: { (_: URL) in FailingURLSessionMockPublisher() }
             )
             .sink(
@@ -55,10 +56,24 @@ final class DataPublisherTests: XCTestCase {
         wait(for: [expectation], timeout: 10.0)
     }
 
-    func testSuccessfullFetch() {
+    func testSuccessfullFetchWithUrl() {
         let expectation = XCTestExpectation(description: "Let publisher publish")
         cancellable = dataPublisher(
-                upstream: $testUpstream,
+                upstream: $testUrlUpstream,
+                remotePublisherClosure: { (_: URL) in URLSessionMockPublisher(testData: TestData.catalog) }
+            )
+            .assertNoFailure()
+            .sink {
+                XCTAssert($0 == TestData.catalog.data)
+                expectation.fulfill()
+            }
+        wait(for: [expectation], timeout: 10.0)
+    }
+    
+    func testSuccessfullFetchWithEndpointComponents() {
+        let expectation = XCTestExpectation(description: "Let publisher publish")
+        cancellable = dataPublisher(
+                upstream: $testEndpointComponentsUpstream,
                 remotePublisherClosure: { (_: URL) in URLSessionMockPublisher(testData: TestData.catalog) }
             )
             .assertNoFailure()

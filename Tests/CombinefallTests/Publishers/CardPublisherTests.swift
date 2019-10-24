@@ -6,7 +6,7 @@ final class CardPublisherTests: XCTestCase {
     @Published var testUpstream: String = ""
     var cancellable: AnyCancellable?
 
-    func testCard() {
+    func testSucessfullFetch() {
         let valueExpectation = XCTestExpectation(description: "Let publisher publish")
         let completionExpectation = XCTestExpectation(description: "Let publisher finish")
         cancellable = _cardPublisher(

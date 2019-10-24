@@ -3,16 +3,27 @@ import Foundation
 
 private let baseURLComponent: URLComponents = URLComponents(string: "https://api.scryfall.com/")!
 
-private enum EndpointComponents {
-    case autocomplete, cardNamed
+enum EndpointComponents {
+    case autocomplete(searchTerm: String), card(named: String), cardImage(named: String, version: ImageVersion)
 
-    var urlComponents: URLComponents {
+    var url: URL {
         var urlComponent = baseURLComponent
         switch self {
-        case .autocomplete: urlComponent.path = "/cards/autocomplete"
-        case .cardNamed: urlComponent.path = "/cards/named"
+        case .autocomplete(let searchTerm):
+            urlComponent.path = "/cards/autocomplete"
+            urlComponent.queryItems = [URLQueryItem(name: "q", value: searchTerm)]
+        case .card(let named):
+            urlComponent.path = "/cards/named"
+            urlComponent.queryItems = [URLQueryItem(name: "exact", value: named)]
+        case .cardImage(let named, let version):
+            urlComponent.path = "/cards/named"
+            urlComponent.queryItems = [
+                URLQueryItem(name: "exact", value: named),
+                URLQueryItem(name: "format", value: "image"),
+                URLQueryItem(name: "version", value: version.rawValue)
+            ]
         }
-        return urlComponent
+        return urlComponent.url!
     }
 }
 
@@ -39,6 +50,17 @@ R.Failure == URLSession.DataTaskPublisher.Failure {
         .eraseToAnyPublisher()
 }
 
+func dataPublisher<U: Publisher, R: Publisher> (
+    upstream: U, remotePublisherClosure: @escaping (URL) -> R
+) -> AnyPublisher<Data, Error>
+where
+U.Output == EndpointComponents,
+U.Failure == Never,
+R.Output == URLSession.DataTaskPublisher.Output,
+R.Failure == URLSession.DataTaskPublisher.Failure {
+    dataPublisher(upstream: upstream.map { $0.url }, remotePublisherClosure: remotePublisherClosure)
+}
+
 func fetchPublisher<U: Publisher, R: Publisher, S: ScryfallModel> (
     upstream: U, remotePublisherClosure: @escaping (URL) -> R
 ) -> AnyPublisher<S, Error>
@@ -54,6 +76,17 @@ R.Failure == URLSession.DataTaskPublisher.Failure {
             return .decode(underlying: error)
         }
         .eraseToAnyPublisher()
+}
+
+func fetchPublisher<U: Publisher, R: Publisher, S: ScryfallModel> (
+    upstream: U, remotePublisherClosure: @escaping (URL) -> R
+) -> AnyPublisher<S, Error>
+where
+U.Output == EndpointComponents,
+U.Failure == Never,
+R.Output == URLSession.DataTaskPublisher.Output,
+R.Failure == URLSession.DataTaskPublisher.Failure {
+    fetchPublisher(upstream: upstream.map { $0.url }, remotePublisherClosure: remotePublisherClosure)
 }
 
 // MARK: - Autocomplete
@@ -72,11 +105,7 @@ R.Failure == URLSession.DataTaskPublisher.Failure {
         upstream: upstream
             .debounce(for: .milliseconds(100), scheduler: scheduler)
             .removeDuplicates()
-            .map { searchTerm -> URL in
-                var autoCompleteComponents = EndpointComponents.autocomplete.urlComponents
-                autoCompleteComponents.queryItems = [URLQueryItem(name: "q", value: searchTerm)]
-                return autoCompleteComponents.url!
-            },
+            .map { EndpointComponents.autocomplete(searchTerm: $0) },
         remotePublisherClosure: remotePublisherClosure
     )
 }
@@ -201,11 +230,7 @@ R.Failure == URLSession.DataTaskPublisher.Failure {
     fetchPublisher(
         upstream: upstream
             .first()
-            .map { cardName -> URL in
-                var cardNamedComponents = EndpointComponents.cardNamed.urlComponents
-                cardNamedComponents.queryItems = [URLQueryItem(name: "exact", value: cardName)]
-                return cardNamedComponents.url!
-            },
+            .map { EndpointComponents.card(named: $0) },
         remotePublisherClosure: remotePublisherClosure
     )
 }
@@ -266,15 +291,7 @@ R.Failure == URLSession.DataTaskPublisher.Failure {
     dataPublisher(
         upstream: upstream
             .first()
-            .map { cardImageParameters -> URL in
-                var autoCompleteComponents = EndpointComponents.cardNamed.urlComponents
-                autoCompleteComponents.queryItems = [
-                    URLQueryItem(name: "exact", value: cardImageParameters.name),
-                    URLQueryItem(name: "format", value: "image"),
-                    URLQueryItem(name: "version", value: cardImageParameters.version.rawValue)
-                ]
-                return autoCompleteComponents.url!
-            },
+            .map { EndpointComponents.cardImage(named: $0.name, version: $0.version).url },
         remotePublisherClosure: remotePublisherClosure
     )
     .eraseToAnyPublisher()
