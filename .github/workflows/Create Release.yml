@@ -1,0 +1,30 @@
+name: Create Release
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  CreateRelease:
+    runs-on: macOS-latest
+    steps:
+    - uses: actions/checkout@v1
+    - name: Test Package
+      run: swift test -v
+    - name: Build Release
+      run: swift build -c release
+    - name: Bump version and push tag
+      uses: anothrNick/github-tag-action@master
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        DEFAULT_BUMP: patch
+      id: bump_version
+    - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ steps.bump_version.outputs.tag}}
+          release_name: ${{ steps.bump_version.outputs.tag }}
