@@ -56,7 +56,7 @@ public struct Card: ScryfallModel {
     ///Scryfall includes many promo cards, tokens, and other esoteric objects that do not have these identifiers.
     public let multiverseIdentifier: [Int]?
     ///The ID on TCGplayer’s API, also known as the productId.
-    public let tcgPlayerIdentifier: Int
+    public let tcgPlayerIdentifier: Int?
     ///A unique ID for oracle identity.
     ///
     ///This value is consistent across reprinted card editions,
