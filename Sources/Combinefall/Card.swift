@@ -318,7 +318,7 @@ public struct Card: ScryfallModel {
     }
 
     public struct RelatedUrls: Decodable {
-        public let gatherer: URL
+        public let gatherer: URL?
         public let tcgplayerDecks: URL
         public let edhrec: URL
         public let mtgtop8: URL
