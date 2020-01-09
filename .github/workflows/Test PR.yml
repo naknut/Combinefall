@@ -6,13 +6,15 @@ jobs:
   SwiftLint:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v1
+      - name: Checkout Code
+        uses: actions/checkout@v2
       - name: SwiftLint
         uses: norio-nomura/action-swiftlint@3.0.1
 
   Test:
-    runs-on: macOS-latest
+    runs-on: macos-latest
     steps:
-    - uses: actions/checkout@v1
+    - name: Checkout Code
+      uses: actions/checkout@v2
     - name: Run tests
       run: swift test -v
