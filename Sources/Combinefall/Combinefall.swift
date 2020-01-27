@@ -39,8 +39,8 @@ public enum CardIdentifier: Encodable {
     case oracleIdentifier(UUID)
     case illustrationIdentifier(UUID)
     case name(String)
-    case nameAndSet(String, String)
-    case collectiorNumberAndSet(String, String)
+    case nameAndSet(name: String, set: String)
+    case collectiorNumberAndSet(collectorNumber: String, set: String)
     
     enum CodingKeys: String, CodingKey {
         case scryfallIdentifier = "id"
