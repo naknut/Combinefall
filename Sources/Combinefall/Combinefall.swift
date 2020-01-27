@@ -4,7 +4,10 @@ import Foundation
 private let baseURLComponent: URLComponents = URLComponents(string: "https://api.scryfall.com/")!
 
 enum EndpointComponents {
-    case autocomplete(searchTerm: String), card(named: String), cardImage(named: String, version: ImageVersion)
+    case autocomplete(searchTerm: String)
+    case card(named: String)
+    case cardImage(named: String, version: ImageVersion)
+    case cardCollection([CardIdentifiers])
 
     var url: URL {
         var urlComponent = baseURLComponent
@@ -22,9 +25,61 @@ enum EndpointComponents {
                 URLQueryItem(name: "format", value: "image"),
                 URLQueryItem(name: "version", value: version.rawValue)
             ]
+        case .cardCollection:
+            urlComponent.path = "/cards/collection"
         }
         return urlComponent.url!
     }
+}
+
+public enum CardIdentifier: Encodable {
+    case scryfallIdentifier(UUID)
+    case magicOnlineIdentifier(Int)
+    case multiversIdentifier(Int)
+    case oracleIdentifier(UUID)
+    case illustrationIdentifier(UUID)
+    case name(String)
+    case nameAndSet(String, String)
+    case collectiorNumberAndSet(String, String)
+    
+    private enum CodingKeys: String, CodingKey {
+        case scryfallIdentifier = "id"
+        case magicOnlineIdentifier = "mtgo_id"
+        case multiverseIdentifier = "multiverse_id"
+        case oracleIdentifier = "oracle_id"
+        case illustrationIdentifier = "illustration_id"
+        case name
+        case set
+        case collectiorNumber = "collector_number"
+    }
+    
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        switch self {
+        case .scryfallIdentifier(let identifier):
+            try container.encode(identifier, forKey: .scryfallIdentifier)
+        case .magicOnlineIdentifier(let identifier):
+            try container.encode(identifier, forKey: .magicOnlineIdentifier)
+        case .multiversIdentifier(let identifier):
+            try container.encode(identifier, forKey: .multiverseIdentifier)
+        case .oracleIdentifier(let identifier):
+            try container.encode(identifier, forKey: .oracleIdentifier)
+        case .illustrationIdentifier(let identifier):
+            try container.encode(identifier, forKey: .illustrationIdentifier)
+        case .name(let name):
+            try container.encode(name, forKey: .name)
+        case .nameAndSet(let name, let set):
+            try container.encode(name, forKey: .name)
+            try container.encode(set, forKey: .set)
+        case .collectiorNumberAndSet(let collectiorNumber, let set):
+            try container.encode(collectiorNumber, forKey: .collectiorNumber)
+            try container.encode(set, forKey: .set)
+        }
+    }
+}
+
+public struct CardIdentifiers: Encodable {
+    public let identifiers: [CardIdentifier]
 }
 
 public enum Error: Swift.Error {
