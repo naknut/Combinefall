@@ -35,7 +35,7 @@ enum EndpointComponents {
 public enum CardIdentifier: Encodable {
     case scryfallIdentifier(UUID)
     case magicOnlineIdentifier(Int)
-    case multiversIdentifier(Int)
+    case multiverseIdentifier(Int)
     case oracleIdentifier(UUID)
     case illustrationIdentifier(UUID)
     case name(String)
@@ -60,7 +60,7 @@ public enum CardIdentifier: Encodable {
             try container.encode(identifier, forKey: .scryfallIdentifier)
         case .magicOnlineIdentifier(let identifier):
             try container.encode(identifier, forKey: .magicOnlineIdentifier)
-        case .multiversIdentifier(let identifier):
+        case .multiverseIdentifier(let identifier):
             try container.encode(identifier, forKey: .multiverseIdentifier)
         case .oracleIdentifier(let identifier):
             try container.encode(identifier, forKey: .oracleIdentifier)
