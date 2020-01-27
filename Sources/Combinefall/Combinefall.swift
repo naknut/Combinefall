@@ -42,7 +42,7 @@ public enum CardIdentifier: Encodable {
     case nameAndSet(String, String)
     case collectiorNumberAndSet(String, String)
     
-    private enum CodingKeys: String, CodingKey {
+    enum CodingKeys: String, CodingKey {
         case scryfallIdentifier = "id"
         case magicOnlineIdentifier = "mtgo_id"
         case multiverseIdentifier = "multiverse_id"
