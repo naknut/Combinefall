@@ -11,7 +11,7 @@ final class CardImageDataPublisherTests: XCTestCase {
         let completionExpectation = XCTestExpectation(description: "Let publisher finish")
         cancellable = _cardImageDataPublisher(
                 upstream: $testUpstream,
-                remotePublisherClosure: { (_: URL) in URLSessionMockPublisher(testData: TestData.catalog) }
+                remotePublisherClosure: { (_: URLRequest) in URLSessionMockPublisher(testData: TestData.catalog) }
             )
             .sink(
                 receiveCompletion: {

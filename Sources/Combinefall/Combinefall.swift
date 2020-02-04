@@ -3,35 +3,6 @@ import Foundation
 
 private let baseURLComponent: URLComponents = URLComponents(string: "https://api.scryfall.com/")!
 
-enum EndpointComponents {
-    case autocomplete(searchTerm: String)
-    case card(named: String)
-    case cardImage(named: String, version: ImageVersion)
-    case cardCollection([CardIdentifiers])
-
-    var url: URL {
-        var urlComponent = baseURLComponent
-        switch self {
-        case .autocomplete(let searchTerm):
-            urlComponent.path = "/cards/autocomplete"
-            urlComponent.queryItems = [URLQueryItem(name: "q", value: searchTerm)]
-        case .card(let named):
-            urlComponent.path = "/cards/named"
-            urlComponent.queryItems = [URLQueryItem(name: "exact", value: named)]
-        case .cardImage(let named, let version):
-            urlComponent.path = "/cards/named"
-            urlComponent.queryItems = [
-                URLQueryItem(name: "exact", value: named),
-                URLQueryItem(name: "format", value: "image"),
-                URLQueryItem(name: "version", value: version.rawValue)
-            ]
-        case .cardCollection:
-            urlComponent.path = "/cards/collection"
-        }
-        return urlComponent.url!
-    }
-}
-
 public enum CardIdentifier: Encodable {
     case scryfallIdentifier(UUID)
     case magicOnlineIdentifier(Int)
@@ -78,19 +49,60 @@ public enum CardIdentifier: Encodable {
     }
 }
 
-public struct CardIdentifiers: Encodable {
-    public let identifiers: [CardIdentifier]
+enum EndpointComponents {
+    case autocomplete(searchTerm: String)
+    case card(named: String)
+    case cardImage(named: String, version: ImageVersion)
+    case cardCollection(CardIdentifiers)
+
+    private var url: URL {
+        var urlComponent = baseURLComponent
+        switch self {
+        case .autocomplete(let searchTerm):
+            urlComponent.path = "/cards/autocomplete"
+            urlComponent.queryItems = [URLQueryItem(name: "q", value: searchTerm)]
+        case .card(let named):
+            urlComponent.path = "/cards/named"
+            urlComponent.queryItems = [URLQueryItem(name: "exact", value: named)]
+        case .cardImage(let named, let version):
+            urlComponent.path = "/cards/named"
+            urlComponent.queryItems = [
+                URLQueryItem(name: "exact", value: named),
+                URLQueryItem(name: "format", value: "image"),
+                URLQueryItem(name: "version", value: version.rawValue)
+            ]
+        case .cardCollection:
+            urlComponent.path = "/cards/collection"
+        }
+        return urlComponent.url!
+    }
+    
+    var urlRequest: URLRequest {
+        switch self {
+        case .cardCollection(let identifiers):
+            var urlRequest = URLRequest(url: url)
+            urlRequest.httpMethod = "POST"
+            urlRequest.httpBody = try! JSONEncoder().encode(identifiers)
+            return urlRequest
+        default: return URLRequest(url: url)
+        }
+    }
 }
 
 public enum Error: Swift.Error {
     case network(underlying: URLError), decode(underlying: Swift.Error), scryfall(underlying: URLError)
 }
 
+typealias RemotePublisherClosure<R: Publisher> = (URLRequest) -> R
+where
+R.Output == URLSession.DataTaskPublisher.Output,
+R.Failure == URLSession.DataTaskPublisher.Failure
+
 func dataPublisher<U: Publisher, R: Publisher> (
-    upstream: U, remotePublisherClosure: @escaping (URL) -> R
+    upstream: U, remotePublisherClosure: @escaping (URLRequest) -> R
 ) -> AnyPublisher<Data, Error>
 where
-U.Output == URL,
+U.Output == URLRequest,
 U.Failure == Never,
 R.Output == URLSession.DataTaskPublisher.Output,
 R.Failure == URLSession.DataTaskPublisher.Failure {
@@ -106,21 +118,21 @@ R.Failure == URLSession.DataTaskPublisher.Failure {
 }
 
 func dataPublisher<U: Publisher, R: Publisher> (
-    upstream: U, remotePublisherClosure: @escaping (URL) -> R
+    upstream: U, remotePublisherClosure: @escaping (URLRequest) -> R
 ) -> AnyPublisher<Data, Error>
 where
 U.Output == EndpointComponents,
 U.Failure == Never,
 R.Output == URLSession.DataTaskPublisher.Output,
 R.Failure == URLSession.DataTaskPublisher.Failure {
-    dataPublisher(upstream: upstream.map { $0.url }, remotePublisherClosure: remotePublisherClosure)
+    dataPublisher(upstream: upstream.map { $0.urlRequest }, remotePublisherClosure: remotePublisherClosure)
 }
 
 func fetchPublisher<U: Publisher, R: Publisher, S: ScryfallModel> (
-    upstream: U, remotePublisherClosure: @escaping (URL) -> R
+    upstream: U, remotePublisherClosure: @escaping (URLRequest) -> R
 ) -> AnyPublisher<S, Error>
 where
-U.Output == URL,
+U.Output == URLRequest,
 U.Failure == Never,
 R.Output == URLSession.DataTaskPublisher.Output,
 R.Failure == URLSession.DataTaskPublisher.Failure {
@@ -134,14 +146,14 @@ R.Failure == URLSession.DataTaskPublisher.Failure {
 }
 
 func fetchPublisher<U: Publisher, R: Publisher, S: ScryfallModel> (
-    upstream: U, remotePublisherClosure: @escaping (URL) -> R
+    upstream: U, remotePublisherClosure: @escaping (URLRequest) -> R
 ) -> AnyPublisher<S, Error>
 where
 U.Output == EndpointComponents,
 U.Failure == Never,
 R.Output == URLSession.DataTaskPublisher.Output,
 R.Failure == URLSession.DataTaskPublisher.Failure {
-    fetchPublisher(upstream: upstream.map { $0.url }, remotePublisherClosure: remotePublisherClosure)
+    fetchPublisher(upstream: upstream.map { $0.urlRequest }, remotePublisherClosure: remotePublisherClosure)
 }
 
 // MARK: - Autocomplete
@@ -149,7 +161,7 @@ R.Failure == URLSession.DataTaskPublisher.Failure {
 // Used internaly to inject remote publisher for testing.
 // swiftlint:disable:next identifier_name
 func _autocompleteCatalogPublisher<U: Publisher, R: Publisher, S: Scheduler> (
-    upstream: U, remotePublisherClosure: @escaping (URL) -> R, scheduler: S
+    upstream: U, remotePublisherClosure: @escaping (URLRequest) -> R, scheduler: S
 ) -> AnyPublisher<AutocompleteCatalog, Combinefall.Error>
 where
 U.Output == String,
@@ -193,7 +205,7 @@ where U.Output == String, U.Failure == Never {
 // Used internaly to inject remote publisher for testing.
 // swiftlint:disable:next identifier_name
 func _autocompletePublisher<U: Publisher, R: Publisher, S: Scheduler>(
-    upstream: U, remotePublisherClosure: @escaping (URL) -> R, scheduler: S
+    upstream: U, remotePublisherClosure: @escaping (URLRequest) -> R, scheduler: S
 ) -> AnyPublisher<[String], Error>
 where
 U.Output == String,
@@ -275,7 +287,7 @@ public extension Publisher where Self.Output == String, Self.Failure == Never {
 // Used internaly to inject remote publisher for testing.
 // swiftlint:disable:next identifier_name
 func _cardPublisher<U: Publisher, R: Publisher> (
-    upstream: U, remotePublisherClosure: @escaping (URL) -> R
+    upstream: U, remotePublisherClosure: @escaping (URLRequest) -> R
 ) -> AnyPublisher<Card, Combinefall.Error>
 where
 U.Output == String,
@@ -336,7 +348,7 @@ public struct CardImageParameters {
 
 // swiftlint:disable:next identifier_name
 func _cardImageDataPublisher<U: Publisher, R: Publisher>(
-    upstream: U, remotePublisherClosure: @escaping (URL) -> R
+    upstream: U, remotePublisherClosure: @escaping (URLRequest) -> R
 ) -> AnyPublisher<Data, Error>
 where
 U.Output == CardImageParameters,
@@ -346,7 +358,7 @@ R.Failure == URLSession.DataTaskPublisher.Failure {
     dataPublisher(
         upstream: upstream
             .first()
-            .map { EndpointComponents.cardImage(named: $0.name, version: $0.version).url },
+            .map { EndpointComponents.cardImage(named: $0.name, version: $0.version).urlRequest },
         remotePublisherClosure: remotePublisherClosure
     )
     .eraseToAnyPublisher()
@@ -378,5 +390,40 @@ public extension Publisher where Self.Output == CardImageParameters, Self.Failur
     /// - Returns: A publisher that publishes `Data` mathing the given `upstream` published element.
     func cardImageData() -> AnyPublisher<Data, Error> {
         cardImageDataPublisher(upstream: self)
+    }
+}
+
+// MARK: - Card Collection
+public struct CardIdentifiers: Encodable {
+    public let identifiers: [CardIdentifier]
+
+    public init(_ identifiers: [CardIdentifier]) { self.identifiers = identifiers }
+
+    public subscript(index: Int) -> CardIdentifier { get { return identifiers[index] }}
+}
+
+// swiftlint:disable:next identifier_name
+func _cardCollectionPublisher<U: Publisher, R: Publisher>(
+    upstream: U, remotePublisherClosure: @escaping (URLRequest) -> R
+) -> AnyPublisher<CardCatalog, Error>
+where
+U.Output == CardIdentifiers,
+U.Failure == Never,
+R.Output == URLSession.DataTaskPublisher.Output,
+R.Failure == URLSession.DataTaskPublisher.Failure {
+    fetchPublisher(
+        upstream: upstream.map { EndpointComponents.cardCollection($0) },
+        remotePublisherClosure: remotePublisherClosure
+    )
+}
+
+public func cardCollectionPublisher<U: Publisher>(upstream: U) -> AnyPublisher<CardCatalog, Error>
+    where U.Output == CardIdentifiers, U.Failure == Never {
+        return _cardCollectionPublisher(upstream: upstream, remotePublisherClosure: URLSession.shared.dataTaskPublisher)
+}
+
+public extension Publisher where Self.Output == CardIdentifiers, Self.Failure == Never {
+    func cardCollection() -> AnyPublisher<CardCatalog, Error> {
+        cardCollectionPublisher(upstream: self)
     }
 }
