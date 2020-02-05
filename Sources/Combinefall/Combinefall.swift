@@ -405,25 +405,25 @@ public struct CardIdentifiers: Encodable {
 // swiftlint:disable:next identifier_name
 func _cardCollectionPublisher<U: Publisher, R: Publisher>(
     upstream: U, remotePublisherClosure: @escaping (URLRequest) -> R
-) -> AnyPublisher<CardCatalog, Error>
+) -> AnyPublisher<CardList, Error>
 where
 U.Output == CardIdentifiers,
 U.Failure == Never,
 R.Output == URLSession.DataTaskPublisher.Output,
 R.Failure == URLSession.DataTaskPublisher.Failure {
     fetchPublisher(
-        upstream: upstream.map { EndpointComponents.cardCollection($0) },
+        upstream: upstream.first().map { EndpointComponents.cardCollection($0) },
         remotePublisherClosure: remotePublisherClosure
     )
 }
 
-public func cardCollectionPublisher<U: Publisher>(upstream: U) -> AnyPublisher<CardCatalog, Error>
+public func cardCollectionPublisher<U: Publisher>(upstream: U) -> AnyPublisher<CardList, Error>
     where U.Output == CardIdentifiers, U.Failure == Never {
         return _cardCollectionPublisher(upstream: upstream, remotePublisherClosure: URLSession.shared.dataTaskPublisher)
 }
 
 public extension Publisher where Self.Output == CardIdentifiers, Self.Failure == Never {
-    func cardCollection() -> AnyPublisher<CardCatalog, Error> {
+    func cardCollection() -> AnyPublisher<CardList, Error> {
         cardCollectionPublisher(upstream: self)
     }
 }
