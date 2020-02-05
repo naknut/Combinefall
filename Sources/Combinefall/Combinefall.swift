@@ -12,7 +12,7 @@ public enum CardIdentifier: Encodable {
     case name(String)
     case nameAndSet(name: String, set: String)
     case collectiorNumberAndSet(collectorNumber: String, set: String)
-    
+
     enum CodingKeys: String, CodingKey {
         case scryfallIdentifier = "id"
         case magicOnlineIdentifier = "mtgo_id"
@@ -23,7 +23,7 @@ public enum CardIdentifier: Encodable {
         case set
         case collectiorNumber = "collector_number"
     }
-    
+
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         switch self {
@@ -76,12 +76,13 @@ enum EndpointComponents {
         }
         return urlComponent.url!
     }
-    
+
     var urlRequest: URLRequest {
         switch self {
         case .cardCollection(let identifiers):
             var urlRequest = URLRequest(url: url)
             urlRequest.httpMethod = "POST"
+            // swiftlint:disable:next force_try
             urlRequest.httpBody = try! JSONEncoder().encode(identifiers)
             return urlRequest
         default: return URLRequest(url: url)
@@ -399,7 +400,7 @@ public struct CardIdentifiers: Encodable {
 
     public init(_ identifiers: [CardIdentifier]) { self.identifiers = identifiers }
 
-    public subscript(index: Int) -> CardIdentifier { get { return identifiers[index] }}
+    public subscript(index: Int) -> CardIdentifier { identifiers[index] }
 }
 
 // swiftlint:disable:next identifier_name

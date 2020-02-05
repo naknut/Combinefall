@@ -27,7 +27,9 @@ public struct List<T: Decodable>: ScryfallModel {
 
     // Used internaly to inject remote publisher for testing.
     // swiftlint:disable:next identifier_name
-    func _nextPagePublisher<R: Publisher>(remotePublisherClosure: @escaping (URLRequest) -> R) -> AnyPublisher<Self, Error>?
+    func _nextPagePublisher<R: Publisher>(
+        remotePublisherClosure: @escaping (URLRequest) -> R
+    ) -> AnyPublisher<Self, Error>?
     where R.Output == URLSession.DataTaskPublisher.Output, R.Failure == URLSession.DataTaskPublisher.Failure {
         guard let nextPage = nextPage else { return nil }
         return fetchPublisher(upstream: Just(URLRequest(url: nextPage)), remotePublisherClosure: remotePublisherClosure)
