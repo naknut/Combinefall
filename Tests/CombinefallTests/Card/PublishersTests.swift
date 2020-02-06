@@ -10,7 +10,7 @@ final class PublishersTests: XCTestCase {
     func testAlternativePrintsListPublisher() {
         let expectation = XCTestExpectation(description: "Let publisher publish")
         cancellable = testCard._alternativePrintsListPublisher(
-                remotePublisherClosure: { (_: URL) in URLSessionMockPublisher(testData: TestData.cardList) }
+                remotePublisherClosure: { (_: URLRequest) in URLSessionMockPublisher(testData: TestData.cardList) }
             )
             .assertNoFailure()
             .sink { _ in expectation.fulfill() }
@@ -20,7 +20,7 @@ final class PublishersTests: XCTestCase {
     func testAlternativePrintsPublisher() {
         let expectation = XCTestExpectation(description: "Let publisher publish")
         cancellable = testCard._alternativePrintsPublisher(
-                remotePublisherClosure: { (_: URL) in URLSessionMockPublisher(testData: TestData.cardList) }
+                remotePublisherClosure: { (_: URLRequest) in URLSessionMockPublisher(testData: TestData.cardList) }
             )
             .assertNoFailure()
             .sink { _ in expectation.fulfill() }

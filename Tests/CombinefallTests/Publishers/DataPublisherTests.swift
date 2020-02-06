@@ -28,15 +28,15 @@ final class DataPublisherTests: XCTestCase {
         }
     }
 
-    @Published var testUrlUpstream: URL = URL(string: "https://example.com")!
+    @Published var testURLRequestUpstream: URLRequest = URLRequest(url: URL(string: "https://example.com")!)
     @Published var testEndpointComponentsUpstream: EndpointComponents = .autocomplete(searchTerm: "Grizzly Bears")
     var cancellable: AnyCancellable?
 
     func testNetworkError() {
         let expectation = XCTestExpectation(description: "Let publisher publish")
         cancellable = dataPublisher(
-                upstream: $testUrlUpstream,
-                remotePublisherClosure: { (_: URL) in FailingURLSessionMockPublisher() }
+                upstream: $testURLRequestUpstream,
+                remotePublisherClosure: { (_: URLRequest) in FailingURLSessionMockPublisher() }
             )
             .sink(
                 receiveCompletion: {
@@ -59,8 +59,8 @@ final class DataPublisherTests: XCTestCase {
     func testSuccessfullFetchWithUrl() {
         let expectation = XCTestExpectation(description: "Let publisher publish")
         cancellable = dataPublisher(
-                upstream: $testUrlUpstream,
-                remotePublisherClosure: { (_: URL) in URLSessionMockPublisher(testData: TestData.catalog) }
+                upstream: $testURLRequestUpstream,
+                remotePublisherClosure: { (_: URLRequest) in URLSessionMockPublisher(testData: TestData.catalog) }
             )
             .assertNoFailure()
             .sink {
@@ -74,7 +74,7 @@ final class DataPublisherTests: XCTestCase {
         let expectation = XCTestExpectation(description: "Let publisher publish")
         cancellable = dataPublisher(
                 upstream: $testEndpointComponentsUpstream,
-                remotePublisherClosure: { (_: URL) in URLSessionMockPublisher(testData: TestData.catalog) }
+                remotePublisherClosure: { (_: URLRequest) in URLSessionMockPublisher(testData: TestData.catalog) }
             )
             .assertNoFailure()
             .sink {

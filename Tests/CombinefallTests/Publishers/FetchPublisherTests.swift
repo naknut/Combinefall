@@ -3,7 +3,7 @@ import Combine
 @testable import Combinefall
 
 final class FetchPublisherTests: XCTestCase {
-    @Published var testUrlUpstream: URL = URL(string: "https://example.com")!
+    @Published var testURLRequestUpstream: URLRequest = URLRequest(url: URL(string: "https://example.com")!)
     @Published var testEndpointComponentsUpstream: EndpointComponents = .autocomplete(searchTerm: "Grizzly Bears")
 
     var cancellable: AnyCancellable?
@@ -11,8 +11,8 @@ final class FetchPublisherTests: XCTestCase {
     func testDecodeError() {
         let expectation = XCTestExpectation(description: "Let publisher publish")
         cancellable = (fetchPublisher(
-                upstream: $testUrlUpstream,
-                remotePublisherClosure: { (_: URL) in URLSessionMockPublisher(testData: TestData.invalid) }
+                upstream: $testURLRequestUpstream,
+                remotePublisherClosure: { (_: URLRequest) in URLSessionMockPublisher(testData: TestData.invalid) }
             ) as AnyPublisher<AutocompleteCatalog, Combinefall.Error>)
             .sink(
                 receiveCompletion: {
@@ -28,8 +28,8 @@ final class FetchPublisherTests: XCTestCase {
     func testSuccessfullFetchWithUrl() {
         let expectation = XCTestExpectation(description: "Let publisher publish")
         cancellable = (fetchPublisher(
-                upstream: $testUrlUpstream,
-                remotePublisherClosure: { (_: URL) in URLSessionMockPublisher(testData: TestData.catalog) }
+                upstream: $testURLRequestUpstream,
+                remotePublisherClosure: { (_: URLRequest) in URLSessionMockPublisher(testData: TestData.catalog) }
             ) as AnyPublisher<AutocompleteCatalog, Combinefall.Error>)
             .sink(
                 receiveCompletion: { _ in },
@@ -42,7 +42,7 @@ final class FetchPublisherTests: XCTestCase {
         let expectation = XCTestExpectation(description: "Let publisher publish")
         cancellable = (fetchPublisher(
                 upstream: $testEndpointComponentsUpstream,
-                remotePublisherClosure: { (_: URL) in URLSessionMockPublisher(testData: TestData.catalog) }
+                remotePublisherClosure: { (_: URLRequest) in URLSessionMockPublisher(testData: TestData.catalog) }
             ) as AnyPublisher<AutocompleteCatalog, Combinefall.Error>)
             .sink(
                 receiveCompletion: { _ in },

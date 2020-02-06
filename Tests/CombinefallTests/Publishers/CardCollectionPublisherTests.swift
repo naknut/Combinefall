@@ -2,16 +2,16 @@ import XCTest
 import Combine
 @testable import Combinefall
 
-final class CardPublisherTests: XCTestCase {
-    @Published var testUpstream: String = ""
+final class CardCollectionPublisherTests: XCTestCase {
+    @Published var testUpstream: CardIdentifiers = CardIdentifiers([])
     var cancellable: AnyCancellable?
 
     func testSucessfullFetch() {
         let valueExpectation = XCTestExpectation(description: "Let publisher publish")
         let completionExpectation = XCTestExpectation(description: "Let publisher finish")
-        cancellable = _cardPublisher(
+        cancellable = _cardCollectionPublisher(
                 upstream: $testUpstream,
-                remotePublisherClosure: { (_: URLRequest) in URLSessionMockPublisher(testData: TestData.card) }
+                remotePublisherClosure: { (_: URLRequest) in URLSessionMockPublisher(testData: TestData.cardList) }
             )
             .sink(
                 receiveCompletion: {

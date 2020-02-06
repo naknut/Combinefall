@@ -27,7 +27,7 @@ struct URLSessionMockPublisher: Publisher {
     typealias Output = URLSession.DataTaskPublisher.Output
     typealias Failure = URLSession.DataTaskPublisher.Failure
 
-    func receive<S>(subscriber: S) where S: Subscriber, Failure == S.Failure, Output == S.Input {
+    func receive<S: Subscriber>(subscriber: S) where Failure == S.Failure, Output == S.Input {
         subscriber.receive(
             subscription: URLSessionMockPublisherSubscription(subscriber: subscriber, testData: testData)
         )

@@ -36,7 +36,7 @@ final class ListTests: XCTestCase {
         let testList = try! JSONDecoder().decode(List<Card>.self, from: TestData.cardListWithMore.data)
         let expectation = XCTestExpectation(description: "Let publisher publish")
         cancellable = testList._nextPagePublisher(
-                remotePublisherClosure: { (_: URL) in URLSessionMockPublisher(testData: TestData.cardList) }
+                remotePublisherClosure: { (_: URLRequest) in URLSessionMockPublisher(testData: TestData.cardList) }
             )?
             .assertNoFailure()
             .sink { _ in expectation.fulfill() }

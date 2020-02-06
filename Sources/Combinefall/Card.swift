@@ -394,10 +394,10 @@ public struct Card: ScryfallModel {
 
     // Used internaly to inject remote publisher for testing.
     // swiftlint:disable:next identifier_name
-    func _alternativePrintsListPublisher<R: Publisher>(remotePublisherClosure: @escaping (URL) -> R)
+    func _alternativePrintsListPublisher<R: Publisher>(remotePublisherClosure: @escaping (URLRequest) -> R)
         -> AnyPublisher<CardList, Error>
     where R.Output == URLSession.DataTaskPublisher.Output, R.Failure == URLSession.DataTaskPublisher.Failure {
-        fetchPublisher(upstream: Just(printsSearchUrl), remotePublisherClosure: remotePublisherClosure)
+        fetchPublisher(upstream: Just(URLRequest(url: printsSearchUrl)), remotePublisherClosure: remotePublisherClosure)
     }
 
     /// Creates a publisher that will publish all of the alternativ prints of this card.
@@ -409,7 +409,7 @@ public struct Card: ScryfallModel {
 
     // Used internaly to inject remote publisher for testing.
     // swiftlint:disable:next identifier_name
-    public func _alternativePrintsPublisher<R: Publisher>(remotePublisherClosure: @escaping (URL) -> R)
+    public func _alternativePrintsPublisher<R: Publisher>(remotePublisherClosure: @escaping (URLRequest) -> R)
         -> AnyPublisher<[Card], Error>
     where R.Output == URLSession.DataTaskPublisher.Output, R.Failure == URLSession.DataTaskPublisher.Failure {
         _alternativePrintsListPublisher(remotePublisherClosure: remotePublisherClosure)
