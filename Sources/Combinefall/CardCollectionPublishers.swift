@@ -61,23 +61,40 @@ public struct CardIdentifiers: Encodable {
 func _cardCollectionPublisher<U: Publisher, R: Publisher>(
     upstream: U, remotePublisherClosure: @escaping (URLRequest) -> R
 ) -> AnyPublisher<CardList, Error>
-where
-U.Output == CardIdentifiers,
-U.Failure == Never,
-R.Output == URLSession.DataTaskPublisher.Output,
-R.Failure == URLSession.DataTaskPublisher.Failure {
-    fetchPublisher(
-        upstream: upstream.first().map { EndpointComponents.cardCollection($0) },
-        remotePublisherClosure: remotePublisherClosure
-    )
+    where
+    U.Output == CardIdentifiers,
+    U.Failure == Never,
+    R.Output == URLSession.DataTaskPublisher.Output,
+    R.Failure == URLSession.DataTaskPublisher.Failure {
+        fetchPublisher(
+            upstream: upstream.first().map { EndpointComponents.cardCollection($0) },
+            remotePublisherClosure: remotePublisherClosure
+        )
 }
 
+///Gets a `CardList` with the collection of requested cards.
+///A maximum of 75 card references may be submitted per request.
+///
+///While `Card`s in the `CardList` be returned in the order that they were requested,
+///cards that aren’t found will throw off the mapping of request identifiers to results,
+///so you should not rely on positional index alone while parsing the data.
+///
+/// - Parameter upstream: _Required_ A publisher which `Output` must be `CardIdentifiers`
+/// - Returns: A publisher that publishes `CardList` mathing the given `upstream` published element.
 public func cardCollectionPublisher<U: Publisher>(upstream: U) -> AnyPublisher<CardList, Error>
     where U.Output == CardIdentifiers, U.Failure == Never {
         return _cardCollectionPublisher(upstream: upstream, remotePublisherClosure: URLSession.shared.dataTaskPublisher)
 }
 
 public extension Publisher where Self.Output == CardIdentifiers, Self.Failure == Never {
+    ///Gets a `CardList` with the collection of requested cards.
+    ///A maximum of 75 card references may be submitted per request.
+    ///
+    ///While `Card`s in the `CardList` be returned in the order that they were requested,
+    ///cards that aren’t found will throw off the mapping of request identifiers to results,
+    ///so you should not rely on positional index alone while parsing the data.
+    ///
+    /// - Returns: A publisher that publishes `CardList` mathing the given `upstream` published element.
     func cardCollection() -> AnyPublisher<CardList, Error> {
         cardCollectionPublisher(upstream: self)
     }
