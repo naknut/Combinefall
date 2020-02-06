@@ -25,9 +25,7 @@ func _cardImageDataPublisher<U: Publisher, R: Publisher>(
     R.Output == URLSession.DataTaskPublisher.Output,
     R.Failure == URLSession.DataTaskPublisher.Failure {
         dataPublisher(
-            upstream: upstream
-                .first()
-                .map { EndpointComponents.cardImage(named: $0.name, version: $0.version).urlRequest },
+            upstream: upstream.map { EndpointComponents.cardImage(named: $0.name, version: $0.version).urlRequest },
             remotePublisherClosure: remotePublisherClosure
         )
             .eraseToAnyPublisher()

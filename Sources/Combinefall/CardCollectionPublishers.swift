@@ -67,7 +67,7 @@ func _cardCollectionPublisher<U: Publisher, R: Publisher>(
     R.Output == URLSession.DataTaskPublisher.Output,
     R.Failure == URLSession.DataTaskPublisher.Failure {
         fetchPublisher(
-            upstream: upstream.first().map { EndpointComponents.cardCollection($0) },
+            upstream: upstream.map { EndpointComponents.cardCollection($0) },
             remotePublisherClosure: remotePublisherClosure
         )
 }
