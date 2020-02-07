@@ -51,9 +51,8 @@ public enum Error: Swift.Error {
 typealias RemotePublisherClosure<R: Publisher> = (URLRequest) -> R
     where R.Output == URLSession.DataTaskPublisher.Output, R.Failure == URLSession.DataTaskPublisher.Failure
 
-func dataPublisher<U: Publisher, R: Publisher> (
-    upstream: U, remotePublisherClosure: @escaping (URLRequest) -> R
-) -> AnyPublisher<Data, Error>
+func dataPublisher<U: Publisher, R: Publisher> (upstream: U, dataTaskPublisher: @escaping (URLRequest) -> R)
+    -> AnyPublisher<Data, Error>
     where
     U.Output == URLRequest,
     U.Failure == Never,
@@ -61,7 +60,7 @@ func dataPublisher<U: Publisher, R: Publisher> (
     R.Failure == URLSession.DataTaskPublisher.Failure {
         upstream
             .setFailureType(to: URLSession.DataTaskPublisher.Failure.self)
-            .flatMap { url -> R in remotePublisherClosure(url) }
+            .flatMap { url -> R in dataTaskPublisher(url) }
             .map { $0.data }
             .mapError { error -> Error in
                 if 400...500 ~= error.errorCode { return .scryfall(underlying: error) }
@@ -70,26 +69,25 @@ func dataPublisher<U: Publisher, R: Publisher> (
         .eraseToAnyPublisher()
 }
 
-func dataPublisher<U: Publisher, R: Publisher> (
-    upstream: U, remotePublisherClosure: @escaping (URLRequest) -> R
-) -> AnyPublisher<Data, Error>
+func dataPublisher<U: Publisher, R: Publisher> (upstream: U, dataTaskPublisher: @escaping (URLRequest) -> R)
+    -> AnyPublisher<Data, Error>
     where
     U.Output == EndpointComponents,
     U.Failure == Never,
     R.Output == URLSession.DataTaskPublisher.Output,
     R.Failure == URLSession.DataTaskPublisher.Failure {
-        dataPublisher(upstream: upstream.map { $0.urlRequest }, remotePublisherClosure: remotePublisherClosure)
+        dataPublisher(upstream: upstream.map { $0.urlRequest }, dataTaskPublisher: dataTaskPublisher)
 }
 
-func fetchPublisher<U: Publisher, R: Publisher, S: ScryfallModel> (
-    upstream: U, remotePublisherClosure: @escaping (URLRequest) -> R
+func fetchPublisher<U: Publisher, R: Publisher, S: ScryfallModel>(
+    upstream: U, dataTaskPublisher: @escaping (URLRequest) -> R
 ) -> AnyPublisher<S, Error>
     where
     U.Output == URLRequest,
     U.Failure == Never,
     R.Output == URLSession.DataTaskPublisher.Output,
     R.Failure == URLSession.DataTaskPublisher.Failure {
-        dataPublisher(upstream: upstream, remotePublisherClosure: remotePublisherClosure)
+        dataPublisher(upstream: upstream, dataTaskPublisher: dataTaskPublisher)
             .decode(type: S.self, decoder: JSONDecoder())
             .mapError { error -> Combinefall.Error in
                 if let error = error as? Combinefall.Error { return error }
@@ -99,12 +97,12 @@ func fetchPublisher<U: Publisher, R: Publisher, S: ScryfallModel> (
 }
 
 func fetchPublisher<U: Publisher, R: Publisher, S: ScryfallModel> (
-    upstream: U, remotePublisherClosure: @escaping (URLRequest) -> R
+    upstream: U, dataTaskPublisher: @escaping (URLRequest) -> R
 ) -> AnyPublisher<S, Error>
     where
     U.Output == EndpointComponents,
     U.Failure == Never,
     R.Output == URLSession.DataTaskPublisher.Output,
     R.Failure == URLSession.DataTaskPublisher.Failure {
-        fetchPublisher(upstream: upstream.map { $0.urlRequest }, remotePublisherClosure: remotePublisherClosure)
+        fetchPublisher(upstream: upstream.map { $0.urlRequest }, dataTaskPublisher: dataTaskPublisher)
 }

@@ -27,17 +27,16 @@ public struct List<T: Decodable>: ScryfallModel {
 
     // Used internaly to inject remote publisher for testing.
     // swiftlint:disable:next identifier_name
-    func _nextPagePublisher<R: Publisher>(
-        remotePublisherClosure: @escaping (URLRequest) -> R
-    ) -> AnyPublisher<Self, Error>?
-    where R.Output == URLSession.DataTaskPublisher.Output, R.Failure == URLSession.DataTaskPublisher.Failure {
-        guard let nextPage = nextPage else { return nil }
-        return fetchPublisher(upstream: Just(URLRequest(url: nextPage)), remotePublisherClosure: remotePublisherClosure)
+    func _nextPagePublisher<R: Publisher>(dataTaskPublisher: @escaping (URLRequest) -> R)
+        -> AnyPublisher<Self, Error>?
+        where R.Output == URLSession.DataTaskPublisher.Output, R.Failure == URLSession.DataTaskPublisher.Failure {
+            guard let nextPage = nextPage else { return nil }
+            return fetchPublisher(upstream: Just(URLRequest(url: nextPage)), dataTaskPublisher: dataTaskPublisher)
     }
 
     /// Creates a publisher that publises the next page of this `List`.
     public func nextPagePublisher() -> AnyPublisher<Self, Error>? {
-        _nextPagePublisher(remotePublisherClosure: URLSession.shared.dataTaskPublisher)
+        _nextPagePublisher(dataTaskPublisher: URLSession.shared.dataTaskPublisher)
     }
 
     enum CodingKeys: String, CodingKey {

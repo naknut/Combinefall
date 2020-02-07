@@ -394,25 +394,25 @@ public struct Card: ScryfallModel {
 
     // Used internaly to inject remote publisher for testing.
     // swiftlint:disable:next identifier_name
-    func _alternativePrintsListPublisher<R: Publisher>(remotePublisherClosure: @escaping (URLRequest) -> R)
+    func _alternativePrintsListPublisher<R: Publisher>(dataTaskPublisher: @escaping (URLRequest) -> R)
         -> AnyPublisher<CardList, Error>
     where R.Output == URLSession.DataTaskPublisher.Output, R.Failure == URLSession.DataTaskPublisher.Failure {
-        fetchPublisher(upstream: Just(URLRequest(url: printsSearchUrl)), remotePublisherClosure: remotePublisherClosure)
+        fetchPublisher(upstream: Just(URLRequest(url: printsSearchUrl)), R: dataTaskPublisher)
     }
 
     /// Creates a publisher that will publish all of the alternativ prints of this card.
     ///
     /// - Returns: A publisher that publishes a `CardCatalog` with all alternative prints of this `Card`.
     public func alternativePrintsListPublisher<S: Scheduler>(on scheduler: S) -> AnyPublisher<CardList, Error> {
-        _alternativePrintsListPublisher(remotePublisherClosure: URLSession.shared.dataTaskPublisher)
+        _alternativePrintsListPublisher(dataTaskPublisher: URLSession.shared.dataTaskPublisher)
     }
 
     // Used internaly to inject remote publisher for testing.
     // swiftlint:disable:next identifier_name
-    public func _alternativePrintsPublisher<R: Publisher>(remotePublisherClosure: @escaping (URLRequest) -> R)
+    public func _alternativePrintsPublisher<R: Publisher>(dataTaskPublisher: @escaping (URLRequest) -> R)
         -> AnyPublisher<[Card], Error>
     where R.Output == URLSession.DataTaskPublisher.Output, R.Failure == URLSession.DataTaskPublisher.Failure {
-        _alternativePrintsListPublisher(remotePublisherClosure: remotePublisherClosure)
+        _alternativePrintsListPublisher(dataTaskPublisher: dataTaskPublisher)
             .map { $0.data }
             .eraseToAnyPublisher()
     }
@@ -421,7 +421,7 @@ public struct Card: ScryfallModel {
     ///
     /// - Returns: A publisher that publishes a `[Card]` with all alternative prints of this `Card`.
     public func alternativePrintsPublisher() -> AnyPublisher<[Card], Error> {
-        _alternativePrintsPublisher(remotePublisherClosure: URLSession.shared.dataTaskPublisher)
+        _alternativePrintsPublisher(dataTaskPublisher: URLSession.shared.dataTaskPublisher)
     }
 
     // MARK: - Decodeable

@@ -7,7 +7,7 @@ public typealias AutocompleteCatalog = Catalog<String>
 // Used internaly to inject remote publisher for testing.
 // swiftlint:disable:next identifier_name
 func _autocompleteCatalogPublisher<U: Publisher, R: Publisher, S: Scheduler> (
-    upstream: U, remotePublisherClosure: @escaping (URLRequest) -> R, scheduler: S
+    upstream: U, dataTaskPublisher: @escaping (URLRequest) -> R, scheduler: S
 ) -> AnyPublisher<AutocompleteCatalog, Combinefall.Error>
     where
     U.Output == String,
@@ -19,7 +19,7 @@ func _autocompleteCatalogPublisher<U: Publisher, R: Publisher, S: Scheduler> (
                 .debounce(for: .milliseconds(100), scheduler: scheduler)
                 .removeDuplicates()
                 .map { EndpointComponents.autocomplete(searchTerm: $0) },
-            remotePublisherClosure: remotePublisherClosure
+            dataTaskPublisher: dataTaskPublisher
         )
 }
 
@@ -41,7 +41,7 @@ public func autocompleteCatalogPublisher<U: Publisher, S: Scheduler>(upstream: U
     -> AnyPublisher<AutocompleteCatalog, Error> where U.Output == String, U.Failure == Never {
         _autocompleteCatalogPublisher(
             upstream: upstream,
-            remotePublisherClosure: URLSession.shared.dataTaskPublisher,
+            dataTaskPublisher: URLSession.shared.dataTaskPublisher,
             scheduler: scheduler
         )
 }
@@ -49,7 +49,7 @@ public func autocompleteCatalogPublisher<U: Publisher, S: Scheduler>(upstream: U
 // Used internaly to inject remote publisher for testing.
 // swiftlint:disable:next identifier_name
 func _autocompletePublisher<U: Publisher, R: Publisher, S: Scheduler>(
-    upstream: U, remotePublisherClosure: @escaping (URLRequest) -> R, scheduler: S
+    upstream: U, dataTaskPublisher: @escaping (URLRequest) -> R, scheduler: S
 ) -> AnyPublisher<[String], Error>
     where
     U.Output == String,
@@ -58,7 +58,7 @@ func _autocompletePublisher<U: Publisher, R: Publisher, S: Scheduler>(
     R.Failure == URLSession.DataTaskPublisher.Failure {
         _autocompleteCatalogPublisher(
             upstream: upstream,
-            remotePublisherClosure: remotePublisherClosure,
+            dataTaskPublisher: dataTaskPublisher,
             scheduler: scheduler
         )
             .map { $0.data }
@@ -83,7 +83,7 @@ public func autocompletePublisher<U: Publisher, S: Scheduler>(upstream: U, sched
     -> AnyPublisher<[String], Error> where U.Output == String, U.Failure == Never {
         _autocompletePublisher(
             upstream: upstream,
-            remotePublisherClosure: URLSession.shared.dataTaskPublisher,
+            dataTaskPublisher: URLSession.shared.dataTaskPublisher,
             scheduler: scheduler
         )
 }

@@ -36,7 +36,7 @@ final class DataPublisherTests: XCTestCase {
         let expectation = XCTestExpectation(description: "Let publisher publish")
         cancellable = dataPublisher(
                 upstream: $testURLRequestUpstream,
-                remotePublisherClosure: { (_: URLRequest) in FailingURLSessionMockPublisher() }
+                dataTaskPublisher: { (_: URLRequest) in FailingURLSessionMockPublisher() }
             )
             .sink(
                 receiveCompletion: {
@@ -60,7 +60,7 @@ final class DataPublisherTests: XCTestCase {
         let expectation = XCTestExpectation(description: "Let publisher publish")
         cancellable = dataPublisher(
                 upstream: $testURLRequestUpstream,
-                remotePublisherClosure: { (_: URLRequest) in URLSessionMockPublisher(testData: TestData.catalog) }
+                dataTaskPublisher: { (_: URLRequest) in URLSessionMockPublisher(testData: TestData.catalog) }
             )
             .assertNoFailure()
             .sink {
@@ -74,7 +74,7 @@ final class DataPublisherTests: XCTestCase {
         let expectation = XCTestExpectation(description: "Let publisher publish")
         cancellable = dataPublisher(
                 upstream: $testEndpointComponentsUpstream,
-                remotePublisherClosure: { (_: URLRequest) in URLSessionMockPublisher(testData: TestData.catalog) }
+                dataTaskPublisher: { (_: URLRequest) in URLSessionMockPublisher(testData: TestData.catalog) }
             )
             .assertNoFailure()
             .sink {
