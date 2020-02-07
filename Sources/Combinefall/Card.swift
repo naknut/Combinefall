@@ -397,7 +397,7 @@ public struct Card: ScryfallModel {
     func _alternativePrintsListPublisher<R: Publisher>(dataTaskPublisher: @escaping (URLRequest) -> R)
         -> AnyPublisher<CardList, Error>
     where R.Output == URLSession.DataTaskPublisher.Output, R.Failure == URLSession.DataTaskPublisher.Failure {
-        fetchPublisher(upstream: Just(URLRequest(url: printsSearchUrl)), R: dataTaskPublisher)
+        fetchPublisher(upstream: Just(URLRequest(url: printsSearchUrl)), dataTaskPublisher: dataTaskPublisher)
     }
 
     /// Creates a publisher that will publish all of the alternativ prints of this card.
