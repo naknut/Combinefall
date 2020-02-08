@@ -3,7 +3,7 @@ import Foundation
 
 // Used internaly to inject remote publisher for testing.
 // swiftlint:disable:next identifier_name
-func _cardPublisher<U: Publisher, R: Publisher> (upstream: U, remotePublisherClosure: @escaping (URLRequest) -> R)
+func _cardPublisher<U: Publisher, R: Publisher> (upstream: U, dataTaskPublisher: @escaping (URLRequest) -> R)
     -> AnyPublisher<Card, Combinefall.Error>
     where
     U.Output == String,
@@ -12,7 +12,7 @@ func _cardPublisher<U: Publisher, R: Publisher> (upstream: U, remotePublisherClo
     R.Failure == URLSession.DataTaskPublisher.Failure {
         fetchPublisher(
             upstream: upstream.map { EndpointComponents.card(named: $0) },
-            remotePublisherClosure: remotePublisherClosure
+            dataTaskPublisher: dataTaskPublisher
         )
 }
 
@@ -27,7 +27,7 @@ public func cardPublisher<U: Publisher>(upstream: U) -> AnyPublisher<Card, Error
     where U.Output == String, U.Failure == Never {
         _cardPublisher(
             upstream: upstream,
-            remotePublisherClosure: URLSession.shared.dataTaskPublisher
+            dataTaskPublisher: URLSession.shared.dataTaskPublisher
         )
 }
 

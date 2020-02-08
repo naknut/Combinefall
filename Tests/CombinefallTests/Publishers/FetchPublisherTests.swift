@@ -12,7 +12,7 @@ final class FetchPublisherTests: XCTestCase {
         let expectation = XCTestExpectation(description: "Let publisher publish")
         cancellable = (fetchPublisher(
                 upstream: $testURLRequestUpstream,
-                remotePublisherClosure: { (_: URLRequest) in URLSessionMockPublisher(testData: TestData.invalid) }
+                dataTaskPublisher: { (_: URLRequest) in URLSessionMockPublisher(testData: TestData.invalid) }
             ) as AnyPublisher<AutocompleteCatalog, Combinefall.Error>)
             .sink(
                 receiveCompletion: {
@@ -29,7 +29,7 @@ final class FetchPublisherTests: XCTestCase {
         let expectation = XCTestExpectation(description: "Let publisher publish")
         cancellable = (fetchPublisher(
                 upstream: $testURLRequestUpstream,
-                remotePublisherClosure: { (_: URLRequest) in URLSessionMockPublisher(testData: TestData.catalog) }
+                dataTaskPublisher: { (_: URLRequest) in URLSessionMockPublisher(testData: TestData.catalog) }
             ) as AnyPublisher<AutocompleteCatalog, Combinefall.Error>)
             .sink(
                 receiveCompletion: { _ in },
@@ -42,7 +42,7 @@ final class FetchPublisherTests: XCTestCase {
         let expectation = XCTestExpectation(description: "Let publisher publish")
         cancellable = (fetchPublisher(
                 upstream: $testEndpointComponentsUpstream,
-                remotePublisherClosure: { (_: URLRequest) in URLSessionMockPublisher(testData: TestData.catalog) }
+                dataTaskPublisher: { (_: URLRequest) in URLSessionMockPublisher(testData: TestData.catalog) }
             ) as AnyPublisher<AutocompleteCatalog, Combinefall.Error>)
             .sink(
                 receiveCompletion: { _ in },

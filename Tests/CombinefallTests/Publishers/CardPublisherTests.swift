@@ -10,7 +10,7 @@ final class CardPublisherTests: XCTestCase {
         let valueExpectation = XCTestExpectation(description: "Let publisher publish")
         cancellable = _cardPublisher(
             upstream: $testUpstream,
-            remotePublisherClosure: { (_: URLRequest) in URLSessionMockPublisher(testData: TestData.card) }
+            dataTaskPublisher: { (_: URLRequest) in URLSessionMockPublisher(testData: TestData.card) }
         )
             .assertNoFailure()
             .sink { _ in valueExpectation.fulfill() }

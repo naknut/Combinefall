@@ -16,9 +16,8 @@ public struct CardImageParameters {
 }
 
 // swiftlint:disable:next identifier_name
-func _cardImageDataPublisher<U: Publisher, R: Publisher>(
-    upstream: U, remotePublisherClosure: @escaping (URLRequest) -> R
-) -> AnyPublisher<Data, Error>
+func _cardImageDataPublisher<U: Publisher, R: Publisher>(upstream: U, dataTaskPublisher: @escaping (URLRequest) -> R)
+    -> AnyPublisher<Data, Error>
     where
     U.Output == CardImageParameters,
     U.Failure == Never,
@@ -26,7 +25,7 @@ func _cardImageDataPublisher<U: Publisher, R: Publisher>(
     R.Failure == URLSession.DataTaskPublisher.Failure {
         dataPublisher(
             upstream: upstream.map { EndpointComponents.cardImage(named: $0.name, version: $0.version).urlRequest },
-            remotePublisherClosure: remotePublisherClosure
+            dataTaskPublisher: dataTaskPublisher
         )
             .eraseToAnyPublisher()
 }
@@ -41,7 +40,7 @@ func _cardImageDataPublisher<U: Publisher, R: Publisher>(
 /// - Returns: A publisher that publishes `Data` mathing the given `upstream` published element.
 public func cardImageDataPublisher<U: Publisher>(upstream: U) -> AnyPublisher<Data, Error>
     where U.Output == CardImageParameters, U.Failure == Never {
-        _cardImageDataPublisher(upstream: upstream, remotePublisherClosure: URLSession.shared.dataTaskPublisher)
+        _cardImageDataPublisher(upstream: upstream, dataTaskPublisher: URLSession.shared.dataTaskPublisher)
 }
 
 public extension Publisher where Self.Output == CardImageParameters, Self.Failure == Never {
