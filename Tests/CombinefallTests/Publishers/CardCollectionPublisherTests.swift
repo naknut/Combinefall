@@ -8,7 +8,7 @@ final class CardCollectionPublisherTests: XCTestCase {
 
     func testSucessfullFetch() {
         let valueExpectation = XCTestExpectation(description: "Let publisher publish")
-        cancellable = _cardCollectionPublisher(
+        cancellable = cardCollectionPublisher(
                 upstream: $testUpstream,
                 dataTaskPublisher: { (_: URLRequest) in URLSessionMockPublisher(testData: TestData.cardList) }
             )
