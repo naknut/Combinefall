@@ -3,8 +3,7 @@ import Combine
 @testable import Combinefall
 
 final class PublishersTests: XCTestCase {
-    // swiftlint:disable:next force_try
-    let testCard = try! JSONDecoder().decode(Card.self, from: TestData.card.data)
+    var testCard: Card!
 
     var cancellable: AnyCancellable?
     func testAlternativePrintsListPublisher() {
@@ -25,5 +24,12 @@ final class PublishersTests: XCTestCase {
             .assertNoFailure()
             .sink { _ in expectation.fulfill() }
         wait(for: [expectation], timeout: 10.0)
+    }
+    
+    override func setUp() {
+        super.setUp()
+        let testCardPath = Bundle.module.path(forResource: "Card", ofType: "json", inDirectory: "Test Data")!
+        // swiftlint:disable:next force_try
+        self.testCard = try! JSONDecoder().decode(Card.self, from: try! Data(contentsOf: URL(fileURLWithPath: testCardPath)))
     }
 }
