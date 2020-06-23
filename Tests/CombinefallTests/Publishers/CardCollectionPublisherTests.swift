@@ -12,6 +12,7 @@ final class CardCollectionPublisherTests: XCTestCase {
             upstream: $testUpstream,
             dataTaskPublisher: { _ -> URLSessionMockPublisher in
                 let path = Bundle.module.path(forResource: "Card List", ofType: "json", inDirectory: "Test Data")!
+                // swiftlint:disable:next force_try
                 return URLSessionMockPublisher(data: try! Data(contentsOf: URL(fileURLWithPath: path)))
             }
         )

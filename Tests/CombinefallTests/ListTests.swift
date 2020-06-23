@@ -27,14 +27,18 @@ final class ListTests: XCTestCase {
 
     func testNextPagePublisherWithNoNextPage() {
         let testListPath = Bundle.module.path(forResource: "Card List", ofType: "json", inDirectory: "Test Data")!
-        let testList = try! JSONDecoder().decode(List<Card>.self, from: try! Data(contentsOf: URL(fileURLWithPath: testListPath)))
+        let testListPathData = try! Data(contentsOf: URL(fileURLWithPath: testListPath))
+        let testList = try! JSONDecoder().decode(List<Card>.self, from: testListPathData)
         XCTAssertNil(testList.nextPagePublisher)
     }
 
     var cancellable: AnyCancellable?
     func testNextPagePublisher() {
-        let testListPath = Bundle.module.path(forResource: "Card List With More", ofType: "json", inDirectory: "Test Data")!
-        let testList = try! JSONDecoder().decode(List<Card>.self, from: try! Data(contentsOf: URL(fileURLWithPath: testListPath)))
+        let testListPath = Bundle.module.path(forResource: "Card List With More",
+                                              ofType: "json",
+                                              inDirectory: "Test Data")!
+        let testListPathData = try! Data(contentsOf: URL(fileURLWithPath: testListPath))
+        let testList = try! JSONDecoder().decode(List<Card>.self, from: testListPathData)
         let expectation = XCTestExpectation(description: "Let publisher publish")
         cancellable = testList.nextPagePublisher(
             dataTaskPublisher: { _ -> URLSessionMockPublisher in
