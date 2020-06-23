@@ -25,18 +25,20 @@ public struct List<T: Decodable>: ScryfallModel {
     /// An array of datapoints.
     public let data: [T]
 
-    // Used internaly to inject remote publisher for testing.
-    // swiftlint:disable:next identifier_name
-    func _nextPagePublisher<R: Publisher>(dataTaskPublisher: @escaping (URLRequest) -> R)
+    /// Creates a publsier that gets the next page of this `List`.
+    /// - Parameter dataTaskPublisher: _Required_ A closure that returns `Publisher` with `Output == URLSession.DataTaskPublisher.Output`
+    ///     and `Failure == URLSession.DataTaskPublisher.Failure`. This is so that you can supply your own `Publisher` from your own `URLSession`
+    /// - Returns: A publisher that publishes `List` containing the `T`s of the next page.
+    public func nextPagePublisher<R: Publisher>(dataTaskPublisher: @escaping (URLRequest) -> R)
         -> AnyPublisher<Self, Error>?
         where R.Output == URLSession.DataTaskPublisher.Output, R.Failure == URLSession.DataTaskPublisher.Failure {
             guard let nextPage = nextPage else { return nil }
             return fetchPublisher(upstream: Just(URLRequest(url: nextPage)), dataTaskPublisher: dataTaskPublisher)
     }
 
-    /// Creates a publisher that publises the next page of this `List`.
-    public func nextPagePublisher() -> AnyPublisher<Self, Error>? {
-        _nextPagePublisher(dataTaskPublisher: URLSession.shared.dataTaskPublisher)
+    /// A publisher that publises the next page of this `List`.
+    public var nextPagePublisher: AnyPublisher<Self, Error>? {
+        nextPagePublisher(dataTaskPublisher: URLSession.shared.dataTaskPublisher)
     }
 
     enum CodingKeys: String, CodingKey {

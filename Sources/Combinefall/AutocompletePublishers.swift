@@ -4,9 +4,24 @@ import Foundation
 /// A `Catalog` containing up to 20 full English card names.
 public typealias AutocompleteCatalog = Catalog<String>
 
-// Used internaly to inject remote publisher for testing.
-// swiftlint:disable:next identifier_name
-func _autocompleteCatalogPublisher<U: Publisher, R: Publisher, S: Scheduler> (
+/// Creates a publisher connected to upstream that queries the autocomplete endpoint of Scryfall.
+///
+/// This function is designed for creating assistive UI elements that allow users to free-type card names.
+///
+/// The names are sorted with the nearest match first, highly favoring results that begin with your given string.
+///
+/// Spaces, punctuation, and capitalization are ignored.
+/// If the `upstream` published `String` is less than 2 characters long,
+/// or if no names match, this publisher wont publish any values.
+///
+/// - Parameters:
+///     - upstream: _Required_ A publisher which `Output` must be `String`.
+///     - scheduler: _Required_ The `Scheduler` on where to preform the operations.
+///     - dataTaskPublisher: _Required_ A closure that returns `Publisher` with `Output == URLSession.DataTaskPublisher.Output`
+///     and `Failure == URLSession.DataTaskPublisher.Failure`. This is so that you can supply your own `Publisher` from your own `URLSession`
+/// - Returns: A publisher that publishes a `AutocompleteCatalog` containing up to
+///            20 full English card names that could be autocompletions of the given `upstream` published element.
+public func autocompleteCatalogPublisher<U: Publisher, R: Publisher, S: Scheduler> (
     upstream: U, dataTaskPublisher: @escaping (URLRequest) -> R, scheduler: S
 ) -> AnyPublisher<AutocompleteCatalog, Combinefall.Error>
     where
@@ -39,7 +54,7 @@ func _autocompleteCatalogPublisher<U: Publisher, R: Publisher, S: Scheduler> (
 ///            20 full English card names that could be autocompletions of the given `upstream` published element.
 public func autocompleteCatalogPublisher<U: Publisher, S: Scheduler>(upstream: U, scheduler: S)
     -> AnyPublisher<AutocompleteCatalog, Error> where U.Output == String, U.Failure == Never {
-        _autocompleteCatalogPublisher(
+        autocompleteCatalogPublisher(
             upstream: upstream,
             dataTaskPublisher: URLSession.shared.dataTaskPublisher,
             scheduler: scheduler
@@ -48,7 +63,7 @@ public func autocompleteCatalogPublisher<U: Publisher, S: Scheduler>(upstream: U
 
 // Used internaly to inject remote publisher for testing.
 // swiftlint:disable:next identifier_name
-func _autocompletePublisher<U: Publisher, R: Publisher, S: Scheduler>(
+public func autocompletePublisher<U: Publisher, R: Publisher, S: Scheduler>(
     upstream: U, dataTaskPublisher: @escaping (URLRequest) -> R, scheduler: S
 ) -> AnyPublisher<[String], Error>
     where
@@ -56,7 +71,7 @@ func _autocompletePublisher<U: Publisher, R: Publisher, S: Scheduler>(
     U.Failure == Never,
     R.Output == URLSession.DataTaskPublisher.Output,
     R.Failure == URLSession.DataTaskPublisher.Failure {
-        _autocompleteCatalogPublisher(
+        autocompleteCatalogPublisher(
             upstream: upstream,
             dataTaskPublisher: dataTaskPublisher,
             scheduler: scheduler
@@ -81,7 +96,7 @@ func _autocompletePublisher<U: Publisher, R: Publisher, S: Scheduler>(
 ///            20 full English card names that could be autocompletions of the given `upstream` published element.
 public func autocompletePublisher<U: Publisher, S: Scheduler>(upstream: U, scheduler: S)
     -> AnyPublisher<[String], Error> where U.Output == String, U.Failure == Never {
-        _autocompletePublisher(
+        autocompletePublisher(
             upstream: upstream,
             dataTaskPublisher: URLSession.shared.dataTaskPublisher,
             scheduler: scheduler

@@ -57,8 +57,22 @@ public struct CardIdentifiers: Encodable {
     public subscript(index: Int) -> CardIdentifier { identifiers[index] }
 }
 
-// swiftlint:disable:next identifier_name
-func _cardCollectionPublisher<U: Publisher, R: Publisher>(
+public typealias DataTaskPublisher<R: Publisher> = (URLRequest) -> R
+    where R.Output == URLSession.DataTaskPublisher.Output, R.Failure == URLSession.DataTaskPublisher.Failure
+
+///Gets a `CardList` with the collection of requested cards.
+///A maximum of 75 card references may be submitted per request.
+///
+///While `Card`s in the `CardList` be returned in the order that they were requested,
+///cards that aren’t found will throw off the mapping of request identifiers to results,
+///so you should not rely on positional index alone while parsing the data.
+///
+/// - Parameters:
+///     - upstream: _Required_ A publisher which `Output` must be `CardIdentifiers`
+///     - dataTaskPublisher: _Required_ A closure that returns `Publisher` with `Output == URLSession.DataTaskPublisher.Output`
+///     and `Failure == URLSession.DataTaskPublisher.Failure`. This is so that you can supply your own `Publisher` from your own `URLSession`
+/// - Returns: A publisher that publishes `CardList` mathing the given `upstream` published element.
+public func cardCollectionPublisher<U: Publisher, R: Publisher>(
     upstream: U, dataTaskPublisher: @escaping (URLRequest) -> R
 ) -> AnyPublisher<CardList, Error>
     where
@@ -83,7 +97,7 @@ func _cardCollectionPublisher<U: Publisher, R: Publisher>(
 /// - Returns: A publisher that publishes `CardList` mathing the given `upstream` published element.
 public func cardCollectionPublisher<U: Publisher>(upstream: U) -> AnyPublisher<CardList, Error>
     where U.Output == CardIdentifiers, U.Failure == Never {
-        return _cardCollectionPublisher(upstream: upstream, dataTaskPublisher: URLSession.shared.dataTaskPublisher)
+        return cardCollectionPublisher(upstream: upstream, dataTaskPublisher: URLSession.shared.dataTaskPublisher)
 }
 
 public extension Publisher where Self.Output == CardIdentifiers, Self.Failure == Never {
