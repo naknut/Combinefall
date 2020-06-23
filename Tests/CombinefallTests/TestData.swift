@@ -1,14 +1,6 @@
 import Foundation
 
 enum TestData: String {
-    case catalog = """
-    {
-        "object": "catalog",
-        "total_values": 1,
-        "data": ["Jace"]
-    }
-    """
-
     case invalid = """
     {
         "object": "catalog",

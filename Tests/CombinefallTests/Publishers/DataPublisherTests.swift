@@ -60,11 +60,16 @@ final class DataPublisherTests: XCTestCase {
         let expectation = XCTestExpectation(description: "Let publisher publish")
         cancellable = dataPublisher(
                 upstream: $testURLRequestUpstream,
-                dataTaskPublisher: { (_: URLRequest) in URLSessionMockPublisher(testData: TestData.catalog) }
+                dataTaskPublisher: { _ -> NewURLSessionMockPublisher in
+                    let path = Bundle.module.path(forResource: "Catalog", ofType: "json", inDirectory: "Test Data")!
+                    return NewURLSessionMockPublisher(data: try! Data(contentsOf: URL(fileURLWithPath: path)))
+                }
             )
             .assertNoFailure()
             .sink {
-                XCTAssert($0 == TestData.catalog.data)
+                let rawDataPath = Bundle.module.path(forResource: "Catalog", ofType: "json", inDirectory: "Test Data")!
+                let rawData = try! Data(contentsOf: URL(fileURLWithPath: rawDataPath))
+                XCTAssert($0 == rawData)
                 expectation.fulfill()
             }
         wait(for: [expectation], timeout: 10.0)
@@ -74,11 +79,16 @@ final class DataPublisherTests: XCTestCase {
         let expectation = XCTestExpectation(description: "Let publisher publish")
         cancellable = dataPublisher(
                 upstream: $testEndpointComponentsUpstream,
-                dataTaskPublisher: { (_: URLRequest) in URLSessionMockPublisher(testData: TestData.catalog) }
+                dataTaskPublisher: { _ -> NewURLSessionMockPublisher in
+                    let path = Bundle.module.path(forResource: "Catalog", ofType: "json", inDirectory: "Test Data")!
+                    return NewURLSessionMockPublisher(data: try! Data(contentsOf: URL(fileURLWithPath: path)))
+                }
             )
             .assertNoFailure()
             .sink {
-                XCTAssert($0 == TestData.catalog.data)
+                let rawDataPath = Bundle.module.path(forResource: "Catalog", ofType: "json", inDirectory: "Test Data")!
+                let rawData = try! Data(contentsOf: URL(fileURLWithPath: rawDataPath))
+                XCTAssert($0 == rawData)
                 expectation.fulfill()
             }
         wait(for: [expectation], timeout: 10.0)
