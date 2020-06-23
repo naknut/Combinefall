@@ -13,9 +13,9 @@ final class FetchPublisherTests: XCTestCase {
         let expectation = XCTestExpectation(description: "Let publisher publish")
         cancellable = (fetchPublisher(
             upstream: $testURLRequestUpstream,
-            dataTaskPublisher: { _ -> NewURLSessionMockPublisher in
+            dataTaskPublisher: { _ -> URLSessionMockPublisher in
                 let path = Bundle.module.path(forResource: "Invalid", ofType: "json", inDirectory: "Test Data")!
-                return NewURLSessionMockPublisher(data: try! Data(contentsOf: URL(fileURLWithPath: path)))
+                return URLSessionMockPublisher(data: try! Data(contentsOf: URL(fileURLWithPath: path)))
             }
         ) as AnyPublisher<AutocompleteCatalog, Combinefall.Error>)
         .sink(
@@ -33,9 +33,9 @@ final class FetchPublisherTests: XCTestCase {
         let expectation = XCTestExpectation(description: "Let publisher publish")
         cancellable = (fetchPublisher(
             upstream: $testURLRequestUpstream,
-            dataTaskPublisher: { _ -> NewURLSessionMockPublisher in
+            dataTaskPublisher: { _ -> URLSessionMockPublisher in
                 let path = Bundle.module.path(forResource: "Catalog", ofType: "json", inDirectory: "Test Data")!
-                return NewURLSessionMockPublisher(data: try! Data(contentsOf: URL(fileURLWithPath: path)))
+                return URLSessionMockPublisher(data: try! Data(contentsOf: URL(fileURLWithPath: path)))
             }
         ) as AnyPublisher<AutocompleteCatalog, Combinefall.Error>)
         .sink(
@@ -49,9 +49,9 @@ final class FetchPublisherTests: XCTestCase {
         let expectation = XCTestExpectation(description: "Let publisher publish")
         cancellable = (fetchPublisher(
             upstream: $testEndpointComponentsUpstream,
-            dataTaskPublisher: { _ -> NewURLSessionMockPublisher in
+            dataTaskPublisher: { _ -> URLSessionMockPublisher in
                 let path = Bundle.module.path(forResource: "Catalog", ofType: "json", inDirectory: "Test Data")!
-                return NewURLSessionMockPublisher(data: try! Data(contentsOf: URL(fileURLWithPath: path)))
+                return URLSessionMockPublisher(data: try! Data(contentsOf: URL(fileURLWithPath: path)))
             }
         ) as AnyPublisher<AutocompleteCatalog, Combinefall.Error>)
         .sink(

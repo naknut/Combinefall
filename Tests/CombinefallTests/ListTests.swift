@@ -33,12 +33,13 @@ final class ListTests: XCTestCase {
 
     var cancellable: AnyCancellable?
     func testNextPagePublisher() {
-        let testList = try! JSONDecoder().decode(List<Card>.self, from: TestData.cardListWithMore.data)
+        let testListPath = Bundle.module.path(forResource: "Card List With More", ofType: "json", inDirectory: "Test Data")!
+        let testList = try! JSONDecoder().decode(List<Card>.self, from: try! Data(contentsOf: URL(fileURLWithPath: testListPath)))
         let expectation = XCTestExpectation(description: "Let publisher publish")
         cancellable = testList.nextPagePublisher(
-            dataTaskPublisher: { _ -> NewURLSessionMockPublisher in
+            dataTaskPublisher: { _ -> URLSessionMockPublisher in
                 let path = Bundle.module.path(forResource: "Card List", ofType: "json", inDirectory: "Test Data")!
-                return NewURLSessionMockPublisher(data: try! Data(contentsOf: URL(fileURLWithPath: path)))
+                return URLSessionMockPublisher(data: try! Data(contentsOf: URL(fileURLWithPath: path)))
             }
         )?
         .assertNoFailure()

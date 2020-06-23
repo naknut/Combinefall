@@ -11,9 +11,9 @@ final class AutocompleteTests: XCTestCase {
         let expectation = XCTestExpectation(description: "Let publisher publish")
         cancellable = autocompleteCatalogPublisher(
             upstream: $testUpstream,
-            dataTaskPublisher: { _ -> NewURLSessionMockPublisher in
+            dataTaskPublisher: { _ -> URLSessionMockPublisher in
                 let path = Bundle.module.path(forResource: "Catalog", ofType: "json", inDirectory: "Test Data")!
-                return NewURLSessionMockPublisher(data: try! Data(contentsOf: URL(fileURLWithPath: path)))
+                return URLSessionMockPublisher(data: try! Data(contentsOf: URL(fileURLWithPath: path)))
             },
             scheduler: RunLoop.current
         )
@@ -31,9 +31,9 @@ final class AutocompleteTests: XCTestCase {
         let expectation = XCTestExpectation(description: "Let publisher publish")
         cancellable = autocompletePublisher(
             upstream: $testUpstream,
-            dataTaskPublisher: { _ -> NewURLSessionMockPublisher in
+            dataTaskPublisher: { _ -> URLSessionMockPublisher in
                 let path = Bundle.module.path(forResource: "Catalog", ofType: "json", inDirectory: "Test Data")!
-                return NewURLSessionMockPublisher(data: try! Data(contentsOf: URL(fileURLWithPath: path)))
+                return URLSessionMockPublisher(data: try! Data(contentsOf: URL(fileURLWithPath: path)))
             },
             scheduler: RunLoop.current
         )

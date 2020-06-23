@@ -11,9 +11,9 @@ final class CardImageDataPublisherTests: XCTestCase {
         let valueExpectation = XCTestExpectation(description: "Let publisher publish")
         cancellable = _cardImageDataPublisher(
             upstream: $testUpstream,
-            dataTaskPublisher: { _ -> NewURLSessionMockPublisher in
+            dataTaskPublisher: { _ -> URLSessionMockPublisher in
                 let path = Bundle.module.path(forResource: "Catalog", ofType: "json", inDirectory: "Test Data")!
-                return NewURLSessionMockPublisher(data: try! Data(contentsOf: URL(fileURLWithPath: path)))
+                return URLSessionMockPublisher(data: try! Data(contentsOf: URL(fileURLWithPath: path)))
             }
         )
         .assertNoFailure()
