@@ -35,62 +35,62 @@ final class DataPublisherTests: XCTestCase {
     func testNetworkError() {
         let expectation = XCTestExpectation(description: "Let publisher publish")
         cancellable = dataPublisher(
-                upstream: $testURLRequestUpstream,
-                dataTaskPublisher: { (_: URLRequest) in FailingURLSessionMockPublisher() }
-            )
-            .sink(
-                receiveCompletion: {
-                    defer { expectation.fulfill() }
-                    guard case let .failure(combinefallError) = $0 else { XCTFail("Publisher didnt fail"); return }
-                    guard case let .network(underlying: urlError) = combinefallError else {
-                        XCTFail("Publisher sent wrong error")
-                        return
-                    }
-                    guard urlError == URLError(.cannotDecodeRawData) else {
-                        XCTFail("Underlying error not matching")
-                        return
-                    }
-                },
-                receiveValue: { _ in }
-            )
+            upstream: $testURLRequestUpstream,
+            dataTaskPublisher: { (_: URLRequest) in FailingURLSessionMockPublisher() }
+        )
+        .sink(
+            receiveCompletion: {
+                defer { expectation.fulfill() }
+                guard case let .failure(combinefallError) = $0 else { XCTFail("Publisher didnt fail"); return }
+                guard case let .network(underlying: urlError) = combinefallError else {
+                    XCTFail("Publisher sent wrong error")
+                    return
+                }
+                guard urlError == URLError(.cannotDecodeRawData) else {
+                    XCTFail("Underlying error not matching")
+                    return
+                }
+            },
+            receiveValue: { _ in }
+        )
         wait(for: [expectation], timeout: 10.0)
     }
 
     func testSuccessfullFetchWithUrl() {
         let expectation = XCTestExpectation(description: "Let publisher publish")
         cancellable = dataPublisher(
-                upstream: $testURLRequestUpstream,
-                dataTaskPublisher: { _ -> NewURLSessionMockPublisher in
-                    let path = Bundle.module.path(forResource: "Catalog", ofType: "json", inDirectory: "Test Data")!
-                    return NewURLSessionMockPublisher(data: try! Data(contentsOf: URL(fileURLWithPath: path)))
-                }
-            )
-            .assertNoFailure()
-            .sink {
-                let rawDataPath = Bundle.module.path(forResource: "Catalog", ofType: "json", inDirectory: "Test Data")!
-                let rawData = try! Data(contentsOf: URL(fileURLWithPath: rawDataPath))
-                XCTAssert($0 == rawData)
-                expectation.fulfill()
+            upstream: $testURLRequestUpstream,
+            dataTaskPublisher: { _ -> NewURLSessionMockPublisher in
+                let path = Bundle.module.path(forResource: "Catalog", ofType: "json", inDirectory: "Test Data")!
+                return NewURLSessionMockPublisher(data: try! Data(contentsOf: URL(fileURLWithPath: path)))
             }
+        )
+        .assertNoFailure()
+        .sink {
+            let rawDataPath = Bundle.module.path(forResource: "Catalog", ofType: "json", inDirectory: "Test Data")!
+            let rawData = try! Data(contentsOf: URL(fileURLWithPath: rawDataPath))
+            XCTAssert($0 == rawData)
+            expectation.fulfill()
+        }
         wait(for: [expectation], timeout: 10.0)
     }
 
     func testSuccessfullFetchWithEndpointComponents() {
         let expectation = XCTestExpectation(description: "Let publisher publish")
         cancellable = dataPublisher(
-                upstream: $testEndpointComponentsUpstream,
-                dataTaskPublisher: { _ -> NewURLSessionMockPublisher in
-                    let path = Bundle.module.path(forResource: "Catalog", ofType: "json", inDirectory: "Test Data")!
-                    return NewURLSessionMockPublisher(data: try! Data(contentsOf: URL(fileURLWithPath: path)))
-                }
-            )
-            .assertNoFailure()
-            .sink {
-                let rawDataPath = Bundle.module.path(forResource: "Catalog", ofType: "json", inDirectory: "Test Data")!
-                let rawData = try! Data(contentsOf: URL(fileURLWithPath: rawDataPath))
-                XCTAssert($0 == rawData)
-                expectation.fulfill()
+            upstream: $testEndpointComponentsUpstream,
+            dataTaskPublisher: { _ -> NewURLSessionMockPublisher in
+                let path = Bundle.module.path(forResource: "Catalog", ofType: "json", inDirectory: "Test Data")!
+                return NewURLSessionMockPublisher(data: try! Data(contentsOf: URL(fileURLWithPath: path)))
             }
+        )
+        .assertNoFailure()
+        .sink {
+            let rawDataPath = Bundle.module.path(forResource: "Catalog", ofType: "json", inDirectory: "Test Data")!
+            let rawData = try! Data(contentsOf: URL(fileURLWithPath: rawDataPath))
+            XCTAssert($0 == rawData)
+            expectation.fulfill()
+        }
         wait(for: [expectation], timeout: 10.0)
     }
 }

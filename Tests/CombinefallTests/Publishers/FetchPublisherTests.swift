@@ -11,49 +11,49 @@ final class FetchPublisherTests: XCTestCase {
     func testDecodeError() {
         let expectation = XCTestExpectation(description: "Let publisher publish")
         cancellable = (fetchPublisher(
-                upstream: $testURLRequestUpstream,
-                dataTaskPublisher: { (_: URLRequest) in URLSessionMockPublisher(testData: TestData.invalid) }
-            ) as AnyPublisher<AutocompleteCatalog, Combinefall.Error>)
-            .sink(
-                receiveCompletion: {
-                    defer { expectation.fulfill() }
-                    guard case let .failure(combinefallError) = $0 else { XCTFail("Publisher didnt fail"); return }
-                    guard case .decode = combinefallError else { XCTFail("Publisher sent wrong error"); return }
-                },
-                receiveValue: { _ in }
-            )
+            upstream: $testURLRequestUpstream,
+            dataTaskPublisher: { (_: URLRequest) in URLSessionMockPublisher(testData: TestData.invalid) }
+        ) as AnyPublisher<AutocompleteCatalog, Combinefall.Error>)
+        .sink(
+            receiveCompletion: {
+                defer { expectation.fulfill() }
+                guard case let .failure(combinefallError) = $0 else { XCTFail("Publisher didnt fail"); return }
+                guard case .decode = combinefallError else { XCTFail("Publisher sent wrong error"); return }
+            },
+            receiveValue: { _ in }
+        )
         wait(for: [expectation], timeout: 10.0)
     }
 
     func testSuccessfullFetchWithUrl() {
         let expectation = XCTestExpectation(description: "Let publisher publish")
         cancellable = (fetchPublisher(
-                upstream: $testURLRequestUpstream,
-                dataTaskPublisher: { _ -> NewURLSessionMockPublisher in
-                    let path = Bundle.module.path(forResource: "Catalog", ofType: "json", inDirectory: "Test Data")!
-                    return NewURLSessionMockPublisher(data: try! Data(contentsOf: URL(fileURLWithPath: path)))
-                }
-            ) as AnyPublisher<AutocompleteCatalog, Combinefall.Error>)
-            .sink(
-                receiveCompletion: { _ in },
-                receiveValue: { _ in expectation.fulfill() }
-            )
+            upstream: $testURLRequestUpstream,
+            dataTaskPublisher: { _ -> NewURLSessionMockPublisher in
+                let path = Bundle.module.path(forResource: "Catalog", ofType: "json", inDirectory: "Test Data")!
+                return NewURLSessionMockPublisher(data: try! Data(contentsOf: URL(fileURLWithPath: path)))
+            }
+        ) as AnyPublisher<AutocompleteCatalog, Combinefall.Error>)
+        .sink(
+            receiveCompletion: { _ in },
+            receiveValue: { _ in expectation.fulfill() }
+        )
         wait(for: [expectation], timeout: 10.0)
     }
 
     func testSuccessfullWithFetchEndpointComponents() {
         let expectation = XCTestExpectation(description: "Let publisher publish")
         cancellable = (fetchPublisher(
-                upstream: $testEndpointComponentsUpstream,
-                dataTaskPublisher: { _ -> NewURLSessionMockPublisher in
-                    let path = Bundle.module.path(forResource: "Catalog", ofType: "json", inDirectory: "Test Data")!
-                    return NewURLSessionMockPublisher(data: try! Data(contentsOf: URL(fileURLWithPath: path)))
-                }
-            ) as AnyPublisher<AutocompleteCatalog, Combinefall.Error>)
-            .sink(
-                receiveCompletion: { _ in },
-                receiveValue: { _ in expectation.fulfill() }
-            )
+            upstream: $testEndpointComponentsUpstream,
+            dataTaskPublisher: { _ -> NewURLSessionMockPublisher in
+                let path = Bundle.module.path(forResource: "Catalog", ofType: "json", inDirectory: "Test Data")!
+                return NewURLSessionMockPublisher(data: try! Data(contentsOf: URL(fileURLWithPath: path)))
+            }
+        ) as AnyPublisher<AutocompleteCatalog, Combinefall.Error>)
+        .sink(
+            receiveCompletion: { _ in },
+            receiveValue: { _ in expectation.fulfill() }
+        )
         wait(for: [expectation], timeout: 10.0)
     }
 }

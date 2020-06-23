@@ -12,8 +12,8 @@ final class CardPublisherTests: XCTestCase {
             upstream: $testUpstream,
             dataTaskPublisher: { (_: URLRequest) in URLSessionMockPublisher(testData: TestData.card) }
         )
-            .assertNoFailure()
-            .sink { _ in valueExpectation.fulfill() }
+        .assertNoFailure()
+        .sink { _ in valueExpectation.fulfill() }
         wait(for: [valueExpectation], timeout: 10.0)
     }
 }

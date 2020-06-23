@@ -7,7 +7,7 @@ enum TestData: String {
         "total_values": 1,
         "data": ["Jace"]
     """
-
+    
     case card = #"""
     {
     "object": "card",
@@ -127,6 +127,6 @@ enum TestData: String {
          "data": []
        }
        """#
-
+    
     var data: Data { self.rawValue.data(using: .utf8)! }
 }

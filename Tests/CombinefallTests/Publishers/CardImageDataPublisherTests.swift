@@ -5,7 +5,7 @@ import Combine
 final class CardImageDataPublisherTests: XCTestCase {
     @Published var testUpstream = CardImageParameters(name: "Ajani", version: .png)
     var cancellable: AnyCancellable?
-    
+
     func testSuccessfullFetch() {
         let valueExpectation = XCTestExpectation(description: "Let publisher publish")
         cancellable = _cardImageDataPublisher(

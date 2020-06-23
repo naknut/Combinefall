@@ -9,9 +9,9 @@ final class CardCollectionPublisherTests: XCTestCase {
     func testSucessfullFetch() {
         let valueExpectation = XCTestExpectation(description: "Let publisher publish")
         cancellable = cardCollectionPublisher(
-                upstream: $testUpstream,
-                dataTaskPublisher: { (_: URLRequest) in URLSessionMockPublisher(testData: TestData.cardList) }
-            )
+            upstream: $testUpstream,
+            dataTaskPublisher: { (_: URLRequest) in URLSessionMockPublisher(testData: TestData.cardList) }
+        )
         .assertNoFailure()
         .sink { _ in valueExpectation.fulfill() }
         wait(for: [valueExpectation], timeout: 10.0)

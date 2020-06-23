@@ -36,10 +36,10 @@ final class ListTests: XCTestCase {
         let testList = try! JSONDecoder().decode(List<Card>.self, from: TestData.cardListWithMore.data)
         let expectation = XCTestExpectation(description: "Let publisher publish")
         cancellable = testList.nextPagePublisher(
-                dataTaskPublisher: { (_: URLRequest) in URLSessionMockPublisher(testData: TestData.cardList) }
-            )?
-            .assertNoFailure()
-            .sink { _ in expectation.fulfill() }
+            dataTaskPublisher: { (_: URLRequest) in URLSessionMockPublisher(testData: TestData.cardList) }
+        )?
+        .assertNoFailure()
+        .sink { _ in expectation.fulfill() }
         XCTAssertNotNil(cancellable)
         wait(for: [expectation], timeout: 10.0)
     }
