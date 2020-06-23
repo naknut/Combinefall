@@ -9,7 +9,10 @@ final class PublishersTests: XCTestCase {
     func testAlternativePrintsListPublisher() {
         let expectation = XCTestExpectation(description: "Let publisher publish")
         cancellable = testCard._alternativePrintsListPublisher(
-                dataTaskPublisher: { (_: URLRequest) in URLSessionMockPublisher(testData: TestData.cardList) }
+                dataTaskPublisher: { _ -> NewURLSessionMockPublisher in
+                    let path = Bundle.module.path(forResource: "Card List", ofType: "json", inDirectory: "Test Data")!
+                    return NewURLSessionMockPublisher(data: try! Data(contentsOf: URL(fileURLWithPath: path)))
+                }
             )
             .assertNoFailure()
             .sink { _ in expectation.fulfill() }
@@ -19,7 +22,10 @@ final class PublishersTests: XCTestCase {
     func testAlternativePrintsPublisher() {
         let expectation = XCTestExpectation(description: "Let publisher publish")
         cancellable = testCard._alternativePrintsPublisher(
-                dataTaskPublisher: { (_: URLRequest) in URLSessionMockPublisher(testData: TestData.cardList) }
+                dataTaskPublisher: { _ -> NewURLSessionMockPublisher in
+                    let path = Bundle.module.path(forResource: "Card List", ofType: "json", inDirectory: "Test Data")!
+                    return NewURLSessionMockPublisher(data: try! Data(contentsOf: URL(fileURLWithPath: path)))
+                }
             )
             .assertNoFailure()
             .sink { _ in expectation.fulfill() }

@@ -1,3 +1,4 @@
+// swiftlint:disable force_try
 import XCTest
 import Combine
 @testable import Combinefall
@@ -25,18 +26,20 @@ final class ListTests: XCTestCase {
     }
 
     func testNextPagePublisherWithNoNextPage() {
-        // swiftlint:disable:next force_try
-        let testList = try! JSONDecoder().decode(List<Card>.self, from: TestData.cardList.data)
+        let testListPath = Bundle.module.path(forResource: "Card List", ofType: "json", inDirectory: "Test Data")!
+        let testList = try! JSONDecoder().decode(List<Card>.self, from: try! Data(contentsOf: URL(fileURLWithPath: testListPath)))
         XCTAssertNil(testList.nextPagePublisher)
     }
 
     var cancellable: AnyCancellable?
     func testNextPagePublisher() {
-        // swiftlint:disable:next force_try
         let testList = try! JSONDecoder().decode(List<Card>.self, from: TestData.cardListWithMore.data)
         let expectation = XCTestExpectation(description: "Let publisher publish")
         cancellable = testList.nextPagePublisher(
-            dataTaskPublisher: { (_: URLRequest) in URLSessionMockPublisher(testData: TestData.cardList) }
+            dataTaskPublisher: { _ -> NewURLSessionMockPublisher in
+                let path = Bundle.module.path(forResource: "Card List", ofType: "json", inDirectory: "Test Data")!
+                return NewURLSessionMockPublisher(data: try! Data(contentsOf: URL(fileURLWithPath: path)))
+            }
         )?
         .assertNoFailure()
         .sink { _ in expectation.fulfill() }

@@ -1,15 +1,6 @@
 import Foundation
 
-enum TestData: String {
-    case cardList = #"""
-    {
-      "object": "list",
-      "total_cards": 0,
-      "has_more": false,
-      "data": []
-    }
-    """#
-    
+enum TestData: String {    
     case cardListWithMore = #"""
        {
          "object": "list",
