@@ -17,8 +17,10 @@ public typealias AutocompleteCatalog = Catalog<String>
 /// - Parameters:
 ///     - upstream: _Required_ A publisher which `Output` must be `String`.
 ///     - scheduler: _Required_ The `Scheduler` on where to preform the operations.
-///     - dataTaskPublisher: _Required_ A closure that returns `Publisher` with `Output == URLSession.DataTaskPublisher.Output`
-///     and `Failure == URLSession.DataTaskPublisher.Failure`. This is so that you can supply your own `Publisher` from your own `URLSession`
+///     - dataTaskPublisher: _Required_ A closure that returns `Publisher`
+///         with `Output == URLSession.DataTaskPublisher.Output`
+///         and `Failure == URLSession.DataTaskPublisher.Failure`.
+///         This is so that you can supply your own `Publisher` from your own `URLSession`
 /// - Returns: A publisher that publishes a `AutocompleteCatalog` containing up to
 ///            20 full English card names that could be autocompletions of the given `upstream` published element.
 public func autocompleteCatalogPublisher<U: Publisher, R: Publisher, S: Scheduler> (
@@ -62,7 +64,6 @@ public func autocompleteCatalogPublisher<U: Publisher, S: Scheduler>(upstream: U
 }
 
 // Used internaly to inject remote publisher for testing.
-// swiftlint:disable:next identifier_name
 public func autocompletePublisher<U: Publisher, R: Publisher, S: Scheduler>(
     upstream: U, dataTaskPublisher: @escaping (URLRequest) -> R, scheduler: S
 ) -> AnyPublisher<[String], Error>

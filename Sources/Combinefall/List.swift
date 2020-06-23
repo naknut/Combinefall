@@ -26,8 +26,10 @@ public struct List<T: Decodable>: ScryfallModel {
     public let data: [T]
 
     /// Creates a publsier that gets the next page of this `List`.
-    /// - Parameter dataTaskPublisher: _Required_ A closure that returns `Publisher` with `Output == URLSession.DataTaskPublisher.Output`
-    ///     and `Failure == URLSession.DataTaskPublisher.Failure`. This is so that you can supply your own `Publisher` from your own `URLSession`
+    /// - Parameter dataTaskPublisher: _Required_ A closure that returns `Publisher`
+    ///     with `Output == URLSession.DataTaskPublisher.Output`
+    ///     and `Failure == URLSession.DataTaskPublisher.Failure`.
+    ///     This is so that you can supply your own `Publisher` from your own `URLSession`
     /// - Returns: A publisher that publishes `List` containing the `T`s of the next page.
     public func nextPagePublisher<R: Publisher>(dataTaskPublisher: @escaping (URLRequest) -> R)
         -> AnyPublisher<Self, Error>?

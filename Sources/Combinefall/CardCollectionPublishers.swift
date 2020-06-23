@@ -69,8 +69,10 @@ public typealias DataTaskPublisher<R: Publisher> = (URLRequest) -> R
 ///
 /// - Parameters:
 ///     - upstream: _Required_ A publisher which `Output` must be `CardIdentifiers`
-///     - dataTaskPublisher: _Required_ A closure that returns `Publisher` with `Output == URLSession.DataTaskPublisher.Output`
-///     and `Failure == URLSession.DataTaskPublisher.Failure`. This is so that you can supply your own `Publisher` from your own `URLSession`
+///     - dataTaskPublisher: _Required_ A closure that returns `Publisher`
+///         with `Output == URLSession.DataTaskPublisher.Output`
+///         and `Failure == URLSession.DataTaskPublisher.Failure`.
+///         This is so that you can supply your own `Publisher` from your own `URLSession`
 /// - Returns: A publisher that publishes `CardList` mathing the given `upstream` published element.
 public func cardCollectionPublisher<U: Publisher, R: Publisher>(
     upstream: U, dataTaskPublisher: @escaping (URLRequest) -> R

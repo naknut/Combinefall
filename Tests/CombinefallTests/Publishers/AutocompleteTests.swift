@@ -1,3 +1,4 @@
+// swiftlint:disable force_try
 import XCTest
 import Combine
 @testable import Combinefall
