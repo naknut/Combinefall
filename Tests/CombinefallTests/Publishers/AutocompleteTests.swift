@@ -8,7 +8,7 @@ final class AutocompleteTests: XCTestCase {
 
     func testAutocompleteCatalog() {
         let expectation = XCTestExpectation(description: "Let publisher publish")
-        cancellable = _autocompleteCatalogPublisher(
+        cancellable = autocompleteCatalogPublisher(
                 upstream: $testUpstream,
                 dataTaskPublisher: { (_: URLRequest) in URLSessionMockPublisher(testData: TestData.catalog) },
                 scheduler: RunLoop.current
@@ -25,7 +25,7 @@ final class AutocompleteTests: XCTestCase {
 
     func testAutocomplete() {
         let expectation = XCTestExpectation(description: "Let publisher publish")
-        cancellable = _autocompletePublisher(
+        cancellable = autocompletePublisher(
                 upstream: $testUpstream,
                 dataTaskPublisher: { (_: URLRequest) in URLSessionMockPublisher(testData: TestData.catalog) },
                 scheduler: RunLoop.current
