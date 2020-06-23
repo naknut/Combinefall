@@ -13,7 +13,10 @@ final class FetchPublisherTests: XCTestCase {
         let expectation = XCTestExpectation(description: "Let publisher publish")
         cancellable = (fetchPublisher(
             upstream: $testURLRequestUpstream,
-            dataTaskPublisher: { (_: URLRequest) in URLSessionMockPublisher(testData: TestData.invalid) }
+            dataTaskPublisher: { _ -> NewURLSessionMockPublisher in
+                let path = Bundle.module.path(forResource: "Invalid", ofType: "json", inDirectory: "Test Data")!
+                return NewURLSessionMockPublisher(data: try! Data(contentsOf: URL(fileURLWithPath: path)))
+            }
         ) as AnyPublisher<AutocompleteCatalog, Combinefall.Error>)
         .sink(
             receiveCompletion: {

@@ -1,13 +1,6 @@
 import Foundation
 
-enum TestData: String {
-    case invalid = """
-    {
-        "object": "catalog",
-        "total_values": 1,
-        "data": ["Jace"]
-    """
-    
+enum TestData: String {    
     case card = #"""
     {
     "object": "card",
