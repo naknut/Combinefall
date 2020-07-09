@@ -5,7 +5,8 @@ private let baseURLComponent: URLComponents = URLComponents(string: "https://api
 
 enum EndpointComponents {
     case autocomplete(searchTerm: String)
-    case card(named: String)
+    case cardNamed(_ named: String)
+    case cardId(_ id: UUID)
     case cardImage(named: String, version: ImageVersion)
     case cardCollection(CardIdentifiers)
 
@@ -15,9 +16,11 @@ enum EndpointComponents {
         case .autocomplete(let searchTerm):
             urlComponent.path = "/cards/autocomplete"
             urlComponent.queryItems = [URLQueryItem(name: "q", value: searchTerm)]
-        case .card(let named):
+        case .cardNamed(let named):
             urlComponent.path = "/cards/named"
             urlComponent.queryItems = [URLQueryItem(name: "exact", value: named)]
+        case .cardId(let id):
+            urlComponent.path = "/cards/\(id.uuidString)"
         case .cardImage(let named, let version):
             urlComponent.path = "/cards/named"
             urlComponent.queryItems = [
