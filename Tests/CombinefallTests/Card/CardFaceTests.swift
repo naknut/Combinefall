@@ -1,6 +1,9 @@
 import XCTest
 @testable import Combinefall
 
+@available(watchOS 8.0, *)
+@available(iOS 15.0, *)
+@available(macOS 12.0, *)
 final class CardFaceTests: XCTestCase {
     func testColorIndicatorCodingKey() {
         XCTAssert(

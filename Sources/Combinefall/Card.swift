@@ -4,11 +4,14 @@ import Combine
 ///Represent individual _Magic: The Gathering_ cards that players
 ///could obtain and add to their collection (with a few minor exceptions).
 // swiftlint:disable:next type_body_length
-public struct Card: ScryfallModel {
+@available(watchOS 8.0, *)
+@available(iOS 15.0, *)
+@available(macOS 12.0, *)
+public struct Card: Listable {
 
     // MARK: - ScryfallModel
 
-    let object: String
+    public let object: String
 
     // MARK: - Core Card Properties
 
@@ -392,38 +395,6 @@ public struct Card: ScryfallModel {
     public let isVariationOfCardWithIdentifier: UUID?
     public let watermark: String?
 
-    // Used internaly to inject remote publisher for testing.
-    // swiftlint:disable:next identifier_name
-    func _alternativePrintsListPublisher<R: Publisher>(dataTaskPublisher: @escaping (URLRequest) -> R)
-        -> AnyPublisher<CardList, Error>
-    where R.Output == URLSession.DataTaskPublisher.Output, R.Failure == URLSession.DataTaskPublisher.Failure {
-        fetchPublisher(upstream: Just(URLRequest(url: printsSearchUrl)), dataTaskPublisher: dataTaskPublisher)
-    }
-
-    /// Creates a publisher that will publish all of the alternativ prints of this card.
-    ///
-    /// - Returns: A publisher that publishes a `CardCatalog` with all alternative prints of this `Card`.
-    public func alternativePrintsListPublisher<S: Scheduler>(on scheduler: S) -> AnyPublisher<CardList, Error> {
-        _alternativePrintsListPublisher(dataTaskPublisher: URLSession.shared.dataTaskPublisher)
-    }
-
-    // Used internaly to inject remote publisher for testing.
-    // swiftlint:disable:next identifier_name
-    public func _alternativePrintsPublisher<R: Publisher>(dataTaskPublisher: @escaping (URLRequest) -> R)
-        -> AnyPublisher<[Card], Error>
-    where R.Output == URLSession.DataTaskPublisher.Output, R.Failure == URLSession.DataTaskPublisher.Failure {
-        _alternativePrintsListPublisher(dataTaskPublisher: dataTaskPublisher)
-            .map { $0.data }
-            .eraseToAnyPublisher()
-    }
-
-    /// Creates a publisher that will publish all of the alternativ prints of this card.
-    ///
-    /// - Returns: A publisher that publishes a `[Card]` with all alternative prints of this `Card`.
-    public func alternativePrintsPublisher() -> AnyPublisher<[Card], Error> {
-        _alternativePrintsPublisher(dataTaskPublisher: URLSession.shared.dataTaskPublisher)
-    }
-
     // MARK: - Decodeable
     enum CodingKeys: String, CodingKey {
         case object
@@ -497,4 +468,30 @@ public struct Card: ScryfallModel {
         case watermark
     }
 // swiftlint:disable:next file_length
+}
+
+@available(watchOS 8.0, *)
+@available(iOS 15.0, *)
+@available(macOS 12.0, *)
+public extension Card {
+    func alternativePrintsList(using session: URLSession) async throws -> CardList {
+        return try CardList.from(jsonData: try await session.data(from: printsSearchUrl).0)
+    }
+    
+    func alternativePrints(using session: URLSession) async throws -> [Card] {
+        return try await alternativePrintsList(using: session).data
+    }
+    
+    var alternativePrintsList: CardList { get async throws { return try await alternativePrintsList(using: .shared) }}
+    
+    var alternativePrints: [Card] { get async throws { return try await alternativePrintsList.data }}
+}
+
+@available(watchOS 8.0, *)
+@available(iOS 15.0, *)
+@available(macOS 12.0, *)
+public func card(named name: String, using session: URLSession = .shared) async throws -> Card {
+    var urlComponents = URLComponents(string: "https://api.scryfall.com/cards/named")!
+    urlComponents.queryItems?.append(URLQueryItem(name: "exact", value: name))
+    return try Card.from(jsonData: try await session.data(from: urlComponents.url!).0)
 }

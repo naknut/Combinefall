@@ -1,6 +1,9 @@
 import XCTest
 @testable import Combinefall
 
+@available(watchOS 8.0, *)
+@available(iOS 15.0, *)
+@available(macOS 12.0, *)
 final class RelatedCardTests: XCTestCase {
     func testComponentMeldPartRawValue() {
         XCTAssert(Card.RelatedCard.Component(rawValue: "meld_part") == .meldPart, "Enum is of wrong case.")
