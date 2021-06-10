@@ -322,13 +322,11 @@ public struct Card: Listable {
 
     public struct RelatedUrls: Decodable {
         public let gatherer: URL?
-        public let tcgplayerDecks: URL
         public let edhrec: URL
         public let mtgtop8: URL
 
         enum CodingKeys: String, CodingKey {
             case gatherer
-            case tcgplayerDecks = "tcgplayer_decks"
             case edhrec
             case mtgtop8
         }
