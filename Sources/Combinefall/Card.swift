@@ -492,6 +492,6 @@ public extension Card {
 @available(macOS 12.0, *)
 public func card(named name: String, using session: URLSession = .shared) async throws -> Card {
     var urlComponents = URLComponents(string: "https://api.scryfall.com/cards/named")!
-    urlComponents.queryItems?.append(URLQueryItem(name: "exact", value: name))
+    urlComponents.queryItems = [URLQueryItem(name: "exact", value: name)]
     return try Card.from(jsonData: try await session.data(from: urlComponents.url!).0)
 }
