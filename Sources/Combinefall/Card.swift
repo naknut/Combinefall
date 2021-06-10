@@ -493,3 +493,20 @@ public func card(named name: String, using session: URLSession = .shared) async 
     urlComponents.queryItems = [URLQueryItem(name: "exact", value: name)]
     return try Card.from(jsonData: try await session.data(from: urlComponents.url!).0)
 }
+
+public enum CardImageVersion: String {
+    case small, normal, large, png, artCrop = "art_crop", borderCrop = "border_crop"
+}
+
+public enum CardImageFace: String {
+    case front, back
+}
+
+public func cardImageUrl(cardName: String, version: CardImageVersion = .large, face: CardImageFace) -> URL {
+    var urlComponents = URLComponents(string: "https://api.scryfall.com/cards/named")!
+    urlComponents.queryItems = [URLQueryItem(name: "format", value: "image"),
+                                URLQueryItem(name: "exact", value: cardName),
+                                URLQueryItem(name: "version", value: version.rawValue),
+                                URLQueryItem(name: "face", value: face.rawValue)]
+    return urlComponents.url!
+}
