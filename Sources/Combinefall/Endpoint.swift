@@ -56,8 +56,11 @@ public enum Endpoint {
             var urlComponents = URLComponents()
             urlComponents.path = "/cards"
             switch self {
-            case let .autocomplete(query): urlComponents.queryItems = [URLQueryItem(name: "q", value: query)]
+            case let .autocomplete(query):
+                urlComponents.path += "/autocomplete"
+                urlComponents.queryItems = [URLQueryItem(name: "q", value: query)]
             case let .named(searchParameter, format):
+                urlComponents.path += "/named"
                 var queryItems = [searchParameter.queryItem]
                 queryItems.append(contentsOf: format.queryItems)
                 urlComponents.queryItems = queryItems
