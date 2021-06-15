@@ -53,4 +53,12 @@ final class URLTests: XCTestCase {
             }
         }
     }
+    
+    func testAutocompletePath() {
+        XCTAssert(Endpoint.CardsSearchOptions.autocomplete("").urlComponents.path == "/cards/autocomplete")
+    }
+    
+    func testNamedPath() {
+        XCTAssert(Endpoint.CardsSearchOptions.named(.exact("")).urlComponents.path == "/cards/named")
+    }
 }
