@@ -69,7 +69,7 @@ public enum Endpoint {
     
     case cards(CardsSearchOptions)
     
-    var url: URL {
+    public var url: URL {
         var urlComponents: URLComponents
         switch self {
         case let .cards(searchOptions): urlComponents = searchOptions.urlComponents
