@@ -18,10 +18,8 @@ public actor AutocompleteHandler {
     public func autocompleteCatalog(query: String) async throws -> AutocompleteCatalog {
         dataTask?.cancel()
         
-        var urlComponents = URLComponents(string: "https://api.scryfall.com/cards/autocomplete")!
-        urlComponents.queryItems = [URLQueryItem(name: "q", value: query)]
         return try await withUnsafeThrowingContinuation { continuation in
-            let dataTask = urlSession.dataTask(with: urlComponents.url!) { data, response, error in
+            let dataTask = urlSession.dataTask(with: Endpoint.cards(.autocomplete(query)).url) { data, response, error in
                 switch (data, error) {
                 case let (data?, _):
                     do {

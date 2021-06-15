@@ -488,10 +488,8 @@ public extension Card {
 @available(watchOS 8.0, *)
 @available(iOS 15.0, *)
 @available(macOS 12.0, *)
-public func card(named name: String, using session: URLSession = .shared) async throws -> Card {
-    var urlComponents = URLComponents(string: "https://api.scryfall.com/cards/named")!
-    urlComponents.queryItems = [URLQueryItem(name: "exact", value: name)]
-    return try Card.from(jsonData: try await session.data(from: urlComponents.url!).0)
+public func card(using searchParameter: Endpoint.CardsSearchOptions.SearchParameter, on session: URLSession = .shared) async throws -> Card {
+    return try Card.from(jsonData: try await session.data(from: Endpoint.cards(.named(searchParameter)).url).0)
 }
 
 public enum CardImageVersion: String {
@@ -500,13 +498,4 @@ public enum CardImageVersion: String {
 
 public enum CardImageFace: String {
     case front, back
-}
-
-public func cardImageUrl(cardName: String, version: CardImageVersion = .large, face: CardImageFace) -> URL {
-    var urlComponents = URLComponents(string: "https://api.scryfall.com/cards/named")!
-    urlComponents.queryItems = [URLQueryItem(name: "format", value: "image"),
-                                URLQueryItem(name: "exact", value: cardName),
-                                URLQueryItem(name: "version", value: version.rawValue),
-                                URLQueryItem(name: "face", value: face.rawValue)]
-    return urlComponents.url!
 }
