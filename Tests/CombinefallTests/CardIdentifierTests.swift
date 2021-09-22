@@ -5,43 +5,43 @@ import XCTest
 final class CardIdentifierTests: XCTestCase {
     func testScryfallIdentifierCodingKey() {
         XCTAssert(
-            CardIdentifier.CodingKeys(rawValue: "id") == .scryfallIdentifier,
+            CardIdentifiers.Identifier.CodingKeys(rawValue: "id") == .scryfallIdentifier,
             "CodingKey is not of the right case"
         )
     }
 
     func testMagicOnlineIdentifierCodingKey() {
         XCTAssert(
-            CardIdentifier.CodingKeys(rawValue: "mtgo_id") == .magicOnlineIdentifier,
+            CardIdentifiers.Identifier.CodingKeys(rawValue: "mtgo_id") == .magicOnlineIdentifier,
             "CodingKey is not of the right case"
         )
     }
 
     func testMultiverseIdentifierCodingKey() {
         XCTAssert(
-            CardIdentifier.CodingKeys(rawValue: "multiverse_id") == .multiverseIdentifier,
+            CardIdentifiers.Identifier.CodingKeys(rawValue: "multiverse_id") == .multiverseIdentifier,
             "CodingKey is not of the right case"
         )
     }
 
     func testIllustrationIdentifierCodingKey() {
         XCTAssert(
-            CardIdentifier.CodingKeys(rawValue: "illustration_id") == .illustrationIdentifier,
+            CardIdentifiers.Identifier.CodingKeys(rawValue: "illustration_id") == .illustrationIdentifier,
             "CodingKey is not of the right case"
         )
     }
 
     func testCollectiorNumberCodingKey() {
         XCTAssert(
-            CardIdentifier.CodingKeys(rawValue: "collector_number") == .collectiorNumber,
+            CardIdentifiers.Identifier.CodingKeys(rawValue: "collector_number") == .collectiorNumber,
             "CodingKey is not of the right case"
         )
     }
 
     func testEncodeScryfallIdentifier() {
         let identifier = UUID()
-        let expectedJSON = "{\"\(CardIdentifier.CodingKeys.scryfallIdentifier.rawValue)\":\"\(identifier)\"}"
-        let jsonData = try! JSONEncoder().encode(CardIdentifier.scryfallIdentifier(identifier))
+        let expectedJSON = "{\"\(CardIdentifiers.Identifier.CodingKeys.scryfallIdentifier.rawValue)\":\"\(identifier)\"}"
+        let jsonData = try! JSONEncoder().encode(CardIdentifiers.Identifier.scryfallIdentifier(identifier))
         XCTAssert(
             jsonData == expectedJSON.data(using: .utf8),
             "JSON: \(String(data: jsonData, encoding: .utf8)!) does not match expected JSON: \(expectedJSON)"
@@ -50,8 +50,8 @@ final class CardIdentifierTests: XCTestCase {
 
     func testEncodeMagicOnlineIdentifier() {
         let identifier = 1
-        let expectedJSON = "{\"\(CardIdentifier.CodingKeys.magicOnlineIdentifier.rawValue)\":\(identifier)}"
-        let jsonData = try! JSONEncoder().encode(CardIdentifier.magicOnlineIdentifier(identifier))
+        let expectedJSON = "{\"\(CardIdentifiers.Identifier.CodingKeys.magicOnlineIdentifier.rawValue)\":\(identifier)}"
+        let jsonData = try! JSONEncoder().encode(CardIdentifiers.Identifier.magicOnlineIdentifier(identifier))
         XCTAssert(
             jsonData == expectedJSON.data(using: .utf8),
             "JSON: \(String(data: jsonData, encoding: .utf8)!) does not match expected JSON: \(expectedJSON)"
@@ -60,8 +60,8 @@ final class CardIdentifierTests: XCTestCase {
 
     func testEncodeMultiversIdentifier() {
         let identifier = 1
-        let expectedJSON = "{\"\(CardIdentifier.CodingKeys.multiverseIdentifier.rawValue)\":\(identifier)}"
-        let jsonData = try! JSONEncoder().encode(CardIdentifier.multiverseIdentifier(identifier))
+        let expectedJSON = "{\"\(CardIdentifiers.Identifier.CodingKeys.multiverseIdentifier.rawValue)\":\(identifier)}"
+        let jsonData = try! JSONEncoder().encode(CardIdentifiers.Identifier.multiverseIdentifier(identifier))
         XCTAssert(
             jsonData == expectedJSON.data(using: .utf8),
             "JSON: \(String(data: jsonData, encoding: .utf8)!) does not match expected JSON: \(expectedJSON)"
@@ -70,8 +70,8 @@ final class CardIdentifierTests: XCTestCase {
 
     func testEncodeOracleIdentifier() {
         let identifier = UUID()
-        let expectedJSON = "{\"\(CardIdentifier.CodingKeys.oracleIdentifier.rawValue)\":\"\(identifier)\"}"
-        let jsonData = try! JSONEncoder().encode(CardIdentifier.oracleIdentifier(identifier))
+        let expectedJSON = "{\"\(CardIdentifiers.Identifier.CodingKeys.oracleIdentifier.rawValue)\":\"\(identifier)\"}"
+        let jsonData = try! JSONEncoder().encode(CardIdentifiers.Identifier.oracleIdentifier(identifier))
         XCTAssert(
             jsonData == expectedJSON.data(using: .utf8),
             "JSON: \(String(data: jsonData, encoding: .utf8)!) does not match expected JSON: \(expectedJSON)"
@@ -80,8 +80,8 @@ final class CardIdentifierTests: XCTestCase {
 
     func testEncodeIllustrationIdentifier() {
         let identifier = UUID()
-        let expectedJSON = "{\"\(CardIdentifier.CodingKeys.illustrationIdentifier.rawValue)\":\"\(identifier)\"}"
-        let jsonData = try! JSONEncoder().encode(CardIdentifier.illustrationIdentifier(identifier))
+        let expectedJSON = "{\"\(CardIdentifiers.Identifier.CodingKeys.illustrationIdentifier.rawValue)\":\"\(identifier)\"}"
+        let jsonData = try! JSONEncoder().encode(CardIdentifiers.Identifier.illustrationIdentifier(identifier))
         XCTAssert(
             jsonData == expectedJSON.data(using: .utf8),
             "JSON: \(String(data: jsonData, encoding: .utf8)!) does not match expected JSON: \(expectedJSON)"
@@ -90,8 +90,8 @@ final class CardIdentifierTests: XCTestCase {
 
     func testEncodeName() {
         let name = "Grizzly Bears"
-        let expectedJSON = "{\"\(CardIdentifier.CodingKeys.name.rawValue)\":\"\(name)\"}"
-        let jsonData = try! JSONEncoder().encode(CardIdentifier.name(name))
+        let expectedJSON = "{\"\(CardIdentifiers.Identifier.CodingKeys.name.rawValue)\":\"\(name)\"}"
+        let jsonData = try! JSONEncoder().encode(CardIdentifiers.Identifier.name(name))
         XCTAssert(
             jsonData == expectedJSON.data(using: .utf8),
             "JSON: \(String(data: jsonData, encoding: .utf8)!) does not match expected JSON: \(expectedJSON)"
@@ -103,10 +103,10 @@ final class CardIdentifierTests: XCTestCase {
         let set = "Alpha"
         let expectedJSON =
             "{" +
-            "\"\(CardIdentifier.CodingKeys.name.rawValue)\":\"\(name)\"," +
-            "\"\(CardIdentifier.CodingKeys.set.rawValue)\":\"\(set)\"" +
+            "\"\(CardIdentifiers.Identifier.CodingKeys.name.rawValue)\":\"\(name)\"," +
+            "\"\(CardIdentifiers.Identifier.CodingKeys.set.rawValue)\":\"\(set)\"" +
             "}"
-        let jsonData = try! JSONEncoder().encode(CardIdentifier.nameAndSet(name: name, set: set))
+        let jsonData = try! JSONEncoder().encode(CardIdentifiers.Identifier.nameAndSet(name: name, set: set))
         XCTAssert(
             jsonData == expectedJSON.data(using: .utf8),
             "JSON: \(String(data: jsonData, encoding: .utf8)!) does not match expected JSON: \(expectedJSON)"
@@ -118,11 +118,11 @@ final class CardIdentifierTests: XCTestCase {
         let set = "Alpha"
         let expectedJSON =
             "{" +
-            "\"\(CardIdentifier.CodingKeys.set.rawValue)\":\"\(set)\"," +
-            "\"\(CardIdentifier.CodingKeys.collectiorNumber.rawValue)\":\"\(collectorNumber)\"" +
+            "\"\(CardIdentifiers.Identifier.CodingKeys.set.rawValue)\":\"\(set)\"," +
+            "\"\(CardIdentifiers.Identifier.CodingKeys.collectiorNumber.rawValue)\":\"\(collectorNumber)\"" +
             "}"
         let jsonData = try! JSONEncoder().encode(
-            CardIdentifier.collectiorNumberAndSet(collectorNumber: collectorNumber, set: set)
+            CardIdentifiers.Identifier.collectiorNumberAndSet(collectorNumber: collectorNumber, set: set)
         )
         XCTAssert(
             jsonData == expectedJSON.data(using: .utf8),

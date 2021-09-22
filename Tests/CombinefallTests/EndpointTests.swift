@@ -55,10 +55,14 @@ final class URLTests: XCTestCase {
     }
     
     func testAutocompletePath() {
-        XCTAssert(Endpoint.CardsSearchOptions.autocomplete("").urlComponents.path == "/cards/autocomplete")
+        XCTAssert(Endpoint.CardsSearchOptions.autocomplete("").urlComponents.path == "cards/autocomplete")
     }
     
     func testNamedPath() {
-        XCTAssert(Endpoint.CardsSearchOptions.named(.exact("")).urlComponents.path == "/cards/named")
+        XCTAssert(Endpoint.CardsSearchOptions.named(.exact("")).urlComponents.path == "cards/named")
+    }
+    
+    func testCollectionPath() {
+        XCTAssert(Endpoint.CardsSearchOptions.collection.urlComponents.path == "cards/collection")
     }
 }

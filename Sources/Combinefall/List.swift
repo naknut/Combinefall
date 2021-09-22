@@ -38,7 +38,13 @@ public struct List<T: ListableScryfallModel>: ScryfallModel {
     }
 }*/
 
-public protocol List: ScryfallModel {
+public protocol Fetching: ScryfallModel {
+    var session: URLSession { get set }
+}
+
+public protocol Listable: Fetching { }
+
+public protocol List: Fetching {
     associatedtype Data: Listable
     
     var object: String { get }
@@ -50,14 +56,15 @@ public protocol List: ScryfallModel {
     func nextPage(using session: URLSession) async throws -> Self?
 }
 
-@available(watchOS 8.0, *)
-@available(iOS 15.0, *)
-@available(macOS 12.0, *)
+//MARK: - Implementations
+
 extension List {
     public func nextPage(using session: URLSession) async throws -> Self? {
         guard let nextPageUrl = nextPageUrl else { return nil }
-        return try Self.from(jsonData: try await session.data(from: nextPageUrl).0)
+        var nextPage = try Self.from(jsonData: try await session.data(from: nextPageUrl).0)
+        nextPage.session = session
+        return nextPage
     }
+    
+    public var nextPage: Self? { get async throws { try await nextPage(using: session) }}
 }
-
-public protocol Listable: ScryfallModel { }

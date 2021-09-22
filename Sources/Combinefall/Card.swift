@@ -4,14 +4,13 @@ import Combine
 ///Represent individual _Magic: The Gathering_ cards that players
 ///could obtain and add to their collection (with a few minor exceptions).
 // swiftlint:disable:next type_body_length
-@available(watchOS 8.0, *)
-@available(iOS 15.0, *)
-@available(macOS 12.0, *)
 public struct Card: Listable {
 
     // MARK: - ScryfallModel
 
     public let object: String
+    
+    public var session: URLSession = .shared
 
     // MARK: - Core Card Properties
 
@@ -468,26 +467,16 @@ public struct Card: Listable {
 // swiftlint:disable:next file_length
 }
 
-@available(watchOS 8.0, *)
-@available(iOS 15.0, *)
-@available(macOS 12.0, *)
 public extension Card {
     func alternativePrintsList(using session: URLSession) async throws -> CardList {
-        return try CardList.from(jsonData: try await session.data(from: printsSearchUrl).0)
+        var cardList = try CardList.from(jsonData: try await session.data(from: printsSearchUrl).0)
+        cardList.session = session
+        return cardList
     }
     
-    func alternativePrints(using session: URLSession) async throws -> [Card] {
-        return try await alternativePrintsList(using: session).data
-    }
-    
-    var alternativePrintsList: CardList { get async throws { return try await alternativePrintsList(using: .shared) }}
-    
-    var alternativePrints: [Card] { get async throws { return try await alternativePrintsList.data }}
+    var alternativePrintsList: CardList { get async throws { return try await alternativePrintsList(using: session) }}
 }
 
-@available(watchOS 8.0, *)
-@available(iOS 15.0, *)
-@available(macOS 12.0, *)
 public func card(using searchParameter: Endpoint.CardsSearchOptions.SearchParameter, on session: URLSession = .shared) async throws -> Card {
     return try Card.from(jsonData: try await session.data(from: Endpoint.cards(.named(searchParameter)).url).0)
 }
@@ -499,3 +488,19 @@ public enum CardImageVersion: String {
 public enum CardImageFace: String {
     case front, back
 }
+
+#if canImport(SwiftUI)
+import SwiftUI
+
+@ViewBuilder func AsyncScryfallImage<C, P>(
+    searchParameter: Endpoint.CardsSearchOptions.SearchParameter,
+    version: Endpoint.CardsSearchOptions.Format.Version,
+    face: Endpoint.CardsSearchOptions.Format.Face,
+    content: @escaping (Image) -> C,
+    placeholder: @escaping () -> P
+) -> some View where C : View, P : View {
+    AsyncImage(url: Endpoint.CardsSearchOptions.named(searchParameter, .image(version, face)).urlComponents.url,
+               content: content,
+               placeholder: placeholder)
+}
+#endif

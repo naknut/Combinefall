@@ -7,25 +7,28 @@
 
 import Foundation
 
-@available(watchOS 8.0, *)
-@available(iOS 15.0, *)
-@available(macOS 12.0, *)
 public struct CardList: List {
+    public typealias Element = Card
+    
     public let object: String
-    public let data: [Card]
+    public let data: [Element]
     public let hasMore: Bool
     public let totalCards: Int
     public let nextPageUrl: URL?
     public let warnings: [String]?
     
+    public var cards: [Card] { data }
+    
+    public var session: URLSession = .shared
+    
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         object = try container.decode(String.self, forKey: .object)
         data = try container.decode([Card].self, forKey: .data)
-        hasMore = try container.decode(Bool?.self, forKey: .hasMore) ?? false
+        hasMore = try container.decodeIfPresent(Bool.self, forKey: .hasMore) ?? false
         totalCards = try container.decode(Int.self, forKey: .totalCards)
-        nextPageUrl = try container.decode(URL?.self, forKey: .nextPageUrl)
-        warnings = try container.decode([String]?.self, forKey: .warnings)
+        nextPageUrl = try container.decodeIfPresent(URL.self, forKey: .nextPageUrl)
+        warnings = try container.decodeIfPresent([String].self, forKey: .warnings)
     }
     
     enum CodingKeys: String, CodingKey {

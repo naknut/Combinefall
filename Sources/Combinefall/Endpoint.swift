@@ -48,13 +48,14 @@ public enum Endpoint {
             }
         }
         
-        case autocomplete(String),
-             named(SearchParameter, Format = .json),
-             id(UUID)
+        case autocomplete(String)
+        case named(SearchParameter, Format = .json)
+        case id(UUID)
+        case collection
         
         var urlComponents: URLComponents {
             var urlComponents = URLComponents()
-            urlComponents.path = "/cards"
+            urlComponents.path = "cards"
             switch self {
             case let .autocomplete(query):
                 urlComponents.path += "/autocomplete"
@@ -65,6 +66,7 @@ public enum Endpoint {
                 queryItems.append(contentsOf: format.queryItems)
                 urlComponents.queryItems = queryItems
             case let .id(id): urlComponents.path += "/\(id.uuidString)"
+            case .collection: urlComponents.path += "/collection"
             }
             return urlComponents
         }

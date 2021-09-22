@@ -2,12 +2,9 @@ import Foundation
 
 public typealias AutocompleteCatalog = Catalog<String>
 
-@available(watchOS 8.0, *)
-@available(iOS 15.0, *)
-@available(macOS 12.0, *)
 public actor AutocompleteHandler {
     private var dataTask: URLSessionDataTask?
-    private let urlSession: URLSession
+    private let session: URLSession
     
     public struct UnknownError: Swift.Error {
         let response: URLResponse?
@@ -15,11 +12,15 @@ public actor AutocompleteHandler {
         fileprivate init(response: URLResponse?) { self.response = response }
     }
     
-    public func autocompleteCatalog(query: String) async throws -> AutocompleteCatalog {
+    public func cancelIfRunning() {
         dataTask?.cancel()
+    }
+    
+    public func autocompleteCatalog(query: String) async throws -> AutocompleteCatalog {
+        cancelIfRunning()
         
         return try await withUnsafeThrowingContinuation { continuation in
-            let dataTask = urlSession.dataTask(with: Endpoint.cards(.autocomplete(query)).url) { data, response, error in
+            let dataTask = session.dataTask(with: Endpoint.cards(.autocomplete(query)).url) { data, response, error in
                 switch (data, error) {
                 case let (data?, _):
                     do {
@@ -29,7 +30,7 @@ public actor AutocompleteHandler {
                     }
                 case let (_, error?):
                     if (error as NSError).code == NSURLErrorCancelled {
-                        continuation.resume(throwing: Task.CancellationError())
+                        continuation.resume(throwing: CancellationError())
                     } else {
                         continuation.resume(throwing: error)
                     }
@@ -43,7 +44,7 @@ public actor AutocompleteHandler {
     
     public func autocomplete(query: String) async throws -> [String] { try await autocompleteCatalog(query: query).data }
     
-    public init(urlSession: URLSession = .shared) { self.urlSession = urlSession }
+    public init(session: URLSession = .shared) { self.session = session }
     
-    deinit { dataTask?.cancel() }
+    deinit { cancelIfRunning() }
 }

@@ -3,9 +3,6 @@ import XCTest
 
 // MARK: - Core Card Properties
 
-@available(watchOS 8.0, *)
-@available(iOS 15.0, *)
-@available(macOS 12.0, *)
 final class GameplayPropertiestTests: XCTestCase {
     func testCardFacesCodingKey() {
         XCTAssert(

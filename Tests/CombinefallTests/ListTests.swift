@@ -2,9 +2,6 @@ import XCTest
 import Combine
 @testable import Combinefall
 
-@available(watchOS 8.0, *)
-@available(iOS 15.0, *)
-@available(macOS 12.0, *)
 final class ListTests: XCTestCase {
     func testTotalCardsCodingKey() {
         XCTAssert(
