@@ -67,13 +67,46 @@ extension CardIdentifiers: Collection {
     }
 }
 
-struct CardLists {
-    typealias Element = Card
+public struct CardCollectionIterator: AsyncIteratorProtocol {
+    let session: URLSession
     
-    public let cardLists: [CardList]
+    private var currentCardListIterator: CardListIterator?
+    private var splitIdentifiers: [CardIdentifiers]
     
-    public init(cardLists: [CardList]) {
-        self.cardLists = cardLists
+    public mutating func next() async throws -> Card? {
+        var next = try await currentCardListIterator?.next()
+        while next == nil {
+            guard let identifiers = splitIdentifiers.popLast() else { return nil }
+            
+            var request = URLRequest(url: Endpoint.cards(.collection).url)
+            request.httpMethod = "POST"
+            request.httpBody = try JSONEncoder().encode(identifiers)
+            
+            var cardList = try CardList.from(jsonData: try await session.data(for: request).0)
+            cardList.session = session
+            
+            var nextAsyncIterator = cardList.makeAsyncIterator()
+            currentCardListIterator = nextAsyncIterator
+            next = try await nextAsyncIterator.next()
+        }
+        return next
+    }
+    
+    init(session: URLSession, splitIdentifiers: [CardIdentifiers]) {
+        self.session = session
+        self.splitIdentifiers = splitIdentifiers.reversed()
+    }
+}
+
+public struct CardCollection: AsyncSequence {
+    public typealias Element = Card
+    
+    let session: URLSession
+    
+    private let splitIdentifiers: [CardIdentifiers]
+    
+    public func makeAsyncIterator() -> CardCollectionIterator {
+        CardCollectionIterator(session: session, splitIdentifiers: splitIdentifiers)
     }
 }
 

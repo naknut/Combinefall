@@ -35,3 +35,27 @@ public struct CardList: List {
         case object, data, hasMore = "has_more", totalCards = "total_cards", nextPageUrl = "next_page", warnings
     }
 }
+
+public struct CardListIterator: AsyncIteratorProtocol {
+    private var currentPage: CardList
+    private var index = 0
+    
+    public mutating func next() async throws -> Card? {
+        if index >= currentPage.data.count {
+            guard let nextPage = try await currentPage.nextPage else { return nil }
+            currentPage = nextPage
+            index = 0
+        }
+        let card = currentPage.data[index]
+        index += 1
+        return card
+    }
+    
+    init(firstPage: CardList) { currentPage = firstPage }
+}
+
+extension CardList: AsyncSequence {
+    public func makeAsyncIterator() -> CardListIterator {
+        CardListIterator(firstPage: self)
+    }
+}

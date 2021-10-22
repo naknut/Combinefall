@@ -5,7 +5,7 @@ import PackageDescription
 
 let package = Package(
     name: "Combinefall",
-    platforms: [.iOS(.v15), .watchOS(.v8)],
+    platforms: [.iOS(.v15), .watchOS(.v8), .macOS(.v12)],
     products: [.library(name: "Combinefall", targets: ["Combinefall"])],
     targets: [
         .target(name: "Combinefall"),

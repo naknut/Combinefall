@@ -488,19 +488,3 @@ public enum CardImageVersion: String {
 public enum CardImageFace: String {
     case front, back
 }
-
-#if canImport(SwiftUI)
-import SwiftUI
-
-@ViewBuilder func AsyncScryfallImage<C, P>(
-    searchParameter: Endpoint.CardsSearchOptions.SearchParameter,
-    version: Endpoint.CardsSearchOptions.Format.Version,
-    face: Endpoint.CardsSearchOptions.Format.Face,
-    content: @escaping (Image) -> C,
-    placeholder: @escaping () -> P
-) -> some View where C : View, P : View {
-    AsyncImage(url: Endpoint.CardsSearchOptions.named(searchParameter, .image(version, face)).urlComponents.url,
-               content: content,
-               placeholder: placeholder)
-}
-#endif

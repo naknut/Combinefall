@@ -3,7 +3,10 @@ import Foundation
 class TwoDataMockURLProtocol: URLProtocol {
     static var dataOne: Data?
     static var dataTwo: Data?
+    
     private static var call: Int = 0
+    
+    static func resetCallCounter() { call = 0 }
     
     override class func canInit(with request: URLRequest) -> Bool {
         return true

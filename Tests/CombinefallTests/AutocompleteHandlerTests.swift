@@ -14,10 +14,6 @@ final class AutocompleteHandlerTests: XCTestCase {
         XCTAssert(results == ["Jace"])
     }
     
-    actor WrappedGroup {
-        
-    }
-    
     func testCancellation() async {
         let configuration = URLSessionConfiguration.default
         configuration.protocolClasses = [LongRunningMockURLProtocol.self]
